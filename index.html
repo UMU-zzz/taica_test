@@ -6,905 +6,386 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LoL 隨機挑戰產生器</title>
 <style>
-:root {
-  --bg: #07111f;
-  --panel: rgba(8, 23, 41, .94);
-  --panel2: rgba(14, 34, 57, .92);
-  --border: #284866;
-  --gold: #d9b66d;
-  --text: #edf4ff;
-  --muted: #a7bad0;
-  --blue: #1688f8;
+:root{
+  --gold:#d9b66d;--blue:#087fe8;--border:#244b70;
+  --panel:rgba(4,19,35,.94);--text:#edf5ff;--muted:#a9bed5;
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  color: var(--text);
-  background: var(--bg);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+*{box-sizing:border-box}
+body{margin:0;background:#06111f;color:var(--text);font-family:Arial,"Microsoft JhengHei",sans-serif}
+button,select,input{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+#backdrop{position:fixed;inset:0;z-index:-2;background:#071526 center/cover no-repeat;filter:brightness(.8)}
+#backdrop:after{content:"";position:absolute;inset:0;background:rgba(2,10,22,var(--shade,.75))}
+header{padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(2,12,25,.91);border-bottom:1px solid var(--gold)}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{font-size:44px;color:var(--gold);text-shadow:0 0 18px #cba34e}
+h1{font-size:clamp(19px,2.3vw,29px);margin:0}
+.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
+.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+select,.btn,input[type=file]{background:#102741;color:var(--text);border:1px solid #385d80;border-radius:7px;padding:9px}
+input[type=range]{width:90px;accent-color:#70b9ff}
+main{max-width:1650px;margin:auto;padding:18px;display:grid;grid-template-columns:255px minmax(0,1fr) 245px;gap:15px}
+.panel,.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 5px 20px #0003}
+.panel{padding:14px}
+.panel h2,.section-title{font-size:17px;color:var(--gold);margin:0 0 14px}
+.section{padding:11px;margin-bottom:11px;border:1px solid #244969;border-radius:9px;background:#0b2036b8}
+.section h3{font-size:14px;margin:0 0 10px}
+.btn{background:#0c2540;color:var(--text);border:1px solid #41678c;border-radius:7px;padding:9px 11px}
+.btn:hover{background:#173b5d}
+.btn.primary{background:#0878e8;border-color:#54a9ff;font-weight:700}
+.btn.primary:hover{background:#208fff}
+.full{width:100%;margin-top:8px}
+.small{padding:6px 9px;font-size:12px}
+.checks{display:grid;gap:10px}
+.checks label{display:flex;align-items:center;gap:8px;font-size:14px}
+input[type=checkbox]{accent-color:#1688f8;width:17px;height:17px}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.theme-btn{min-height:54px;color:var(--text);background:#102a44;border:1px solid var(--border);border-radius:7px}
+.theme-btn.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.note,.muted{color:var(--muted);font-size:12px;line-height:1.6}
+.range{margin-top:10px}
+.range label{display:flex;justify-content:space-between;font-size:12px}
+.range input{width:100%}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.topline h2{margin:0;font-size:21px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.summary-item{display:flex;align-items:center;gap:9px;padding:11px;min-width:0}
+.summary-item img{width:48px;height:48px;object-fit:cover;border-radius:7px}
+.summary-icon{font-size:30px;color:var(--gold)}
+.summary-item small{display:block;color:var(--muted);font-size:11px}
+.summary-item strong{display:block;overflow-wrap:anywhere;font-size:14px;margin-top:4px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.card{padding:12px;min-width:0}
+.card-title{display:flex;justify-content:space-between;gap:5px;color:var(--gold);font-size:16px;font-weight:bold;padding-bottom:9px;border-bottom:1px solid #39516a;margin-bottom:10px}
+.splash{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;border-radius:7px}
+.hero-name{font-size:21px;margin:10px 0 3px}
+.lane-symbol{font-size:72px;color:var(--gold);text-align:center;padding:24px 0 10px}
+.center{text-align:center}
+.spells{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.spell{text-align:center;min-width:0}
+.spell img{width:min(72px,100%);aspect-ratio:1;object-fit:cover;border-radius:9px;border:1px solid #b9a064}
+.spell strong{display:block;font-size:13px;margin-top:7px;overflow-wrap:anywhere}
+.actions{display:grid;gap:7px;margin-top:13px}
+.actions button{width:100%}
+.locked{border-color:var(--gold);box-shadow:inset 0 0 0 1px #d9b66d33}
+.runes{margin-top:12px}
+.rune-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.tree-head{display:flex;align-items:center;gap:8px;color:var(--gold);margin-bottom:10px;font-weight:bold}
+.tree-head img{width:37px;height:37px;object-fit:contain}
+.rune-list{display:grid;gap:9px}
+.rune-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.rune-item img{width:35px;height:35px;object-fit:contain;flex-shrink:0}
+.rune-item small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.shards{border-left:1px solid var(--border);padding-left:12px}
+.shard{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:12px}
+.shard-icon{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--gold);border-radius:50%;color:var(--gold);flex-shrink:0}
+.rightbar{display:flex;flex-direction:column;gap:12px}
+.rules{padding-left:19px;color:#c7d6e7;font-size:13px;line-height:1.9}
+.status{font-size:12px;line-height:1.7;color:var(--muted);overflow-wrap:anywhere}
+.status.ok{color:#83e0ae}.status.error{color:#ff9d9d}
+footer{text-align:center;padding:18px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+#toast{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:12px 17px;border:1px solid #5880a1;border-radius:9px;background:#102a44;z-index:10;max-width:90vw}
+#loading{position:fixed;inset:0;background:#031020eF;z-index:20;display:grid;place-items:center;text-align:center;padding:20px}
+.spinner{font-size:40px;color:var(--gold);animation:spin 2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1150px){
+ main{grid-template-columns:225px minmax(0,1fr)}
+ .rightbar{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+ .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-button, input, select { font: inherit; }
-button { cursor: pointer; }
-button:disabled { opacity: .5; cursor: not-allowed; }
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-position: center;
-  background-size: cover;
-  transition: filter .2s;
-}
-.backdrop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(3, 10, 21, var(--shade, .78));
-}
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(3, 12, 24, .9);
-}
-.brand { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 36px; color: var(--gold); }
-h1 { margin: 0; font-size: clamp(20px, 3vw, 29px); }
-.subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
-.header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-select, input[type="text"], .control {
-  color: var(--text);
-  background: #10243b;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px;
-}
-input[type="range"] { width: 110px; accent-color: var(--blue); }
-main {
-  max-width: 1500px;
-  margin: auto;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 245px;
-  gap: 16px;
-}
-.panel, .card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.panel { padding: 15px; }
-.panel h2, .section-title {
-  font-size: 18px;
-  margin: 0 0 12px;
-  color: var(--gold);
-}
-.panel h3 { margin: 0 0 10px; font-size: 15px; }
-.section { margin-bottom: 15px; }
-.theme-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.theme-btn {
-  min-height: 52px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  background: var(--panel2);
-  padding: 5px;
-  font-size: 12px;
-}
-.theme-btn.active { border-color: var(--gold); }
-.btn {
-  color: var(--text);
-  background: #102741;
-  border: 1px solid #54799c;
-  border-radius: 8px;
-  padding: 10px 12px;
-  transition: background .15s;
-}
-.btn:hover { background: #1b3c5d; }
-.btn.primary {
-  background: #0878e9;
-  border-color: #3699ff;
-  font-weight: 700;
-}
-.btn.primary:hover { background: #2190ff; }
-.btn.full { width: 100%; margin-top: 8px; }
-.btn.small { padding: 6px 9px; font-size: 12px; }
-.check-list { display: grid; gap: 9px; }
-.check-list label { display: flex; gap: 9px; align-items: center; }
-input[type="checkbox"] { accent-color: var(--blue); width: 17px; height: 17px; }
-.range-row { margin-top: 12px; }
-.range-row label { display: flex; justify-content: space-between; font-size: 13px; }
-.range-row input { width: 100%; }
-.results-top {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
-}
-.results-top h2 { margin: 0; font-size: 22px; }
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.summary {
-  padding: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-}
-.summary img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; }
-.summary .big-icon { font-size: 32px; color: var(--gold); }
-.summary strong { display: block; overflow-wrap: anywhere; }
-.summary small { color: var(--muted); }
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-.card { padding: 12px; min-width: 0; }
-.card-title {
-  color: var(--gold); font-size: 17px; font-weight: 700;
-  margin-bottom: 10px; padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.hero-splash { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; }
-.hero-icon { width: 100%; max-width: 180px; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
-.center { text-align: center; }
-.lane-symbol { font-size: 64px; color: var(--gold); padding: 22px 0; }
-.spell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.spell { text-align: center; min-width: 0; }
-.spell img { width: 68px; height: 68px; object-fit: cover; border-radius: 10px; }
-.spell div { margin-top: 6px; font-weight: 600; overflow-wrap: anywhere; }
-.card-actions { display: grid; gap: 7px; margin-top: 12px; }
-.card-actions button { width: 100%; }
-.locked { border-color: var(--gold); box-shadow: inset 0 0 0 1px rgba(217,182,109,.15); }
-.rune-card { margin-top: 14px; }
-.rune-layout {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
-}
-.rune-tree { min-width: 0; }
-.tree-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.tree-head img { width: 36px; height: 36px; object-fit: contain; }
-.tree-head strong { color: var(--gold); }
-.rune-list { display: grid; gap: 9px; }
-.rune-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.rune-item img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
-.rune-item small { display: block; color: var(--muted); }
-.shards { border-left: 1px solid var(--border); padding-left: 12px; }
-.shard-row { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 13px; }
-.shard-icon {
-  width: 33px; height: 33px; border: 1px solid var(--gold);
-  border-radius: 50%; display: grid; place-items: center; color: var(--gold);
-  flex-shrink: 0;
-}
-.info-text { color: var(--muted); font-size: 13px; line-height: 1.65; }
-.status { font-size: 13px; color: var(--muted); line-height: 1.7; }
-.status.error { color: #ff9c9c; }
-.status.ok { color: #8ee3ba; }
-.rule-list { padding-left: 19px; color: var(--muted); font-size: 13px; line-height: 1.8; }
-footer { text-align: center; padding: 20px; color: var(--muted); font-size: 12px; }
-#toast {
-  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-  background: #153654; border: 1px solid #5780a3; border-radius: 9px;
-  padding: 11px 16px; max-width: 90vw; z-index: 10; display: none;
-}
-#loading {
-  position: fixed; inset: 0; background: rgba(3,10,20,.88); z-index: 20;
-  display: grid; place-items: center; text-align: center; padding: 20px;
-}
-.spinner { font-size: 35px; animation: spin 1.5s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-@media (max-width: 1100px) {
-  main { grid-template-columns: 230px minmax(0, 1fr); }
-  .rightbar { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-}
-@media (max-width: 700px) {
-  header { padding: 13px; }
-  main { display: flex; flex-direction: column; padding: 10px; }
-  .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .cards-grid { grid-template-columns: 1fr; }
-  .rune-layout { grid-template-columns: 1fr 1fr; }
-  .shards { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--border); padding: 12px 0 0; }
-  .rightbar { display: flex; flex-direction: column; }
-  .header-controls { width: 100%; }
-  .header-controls select { flex: 1; min-width: 120px; }
+@media(max-width:720px){
+ header{padding:12px}.controls{width:100%}.controls select{flex:1;min-width:115px}
+ main{display:flex;flex-direction:column;padding:10px}
+ .cards{grid-template-columns:1fr}
+ .rune-layout{grid-template-columns:1fr 1fr}
+ .shards{grid-column:1/-1;border-left:0;border-top:1px solid var(--border);padding:12px 0 0}
+ .rightbar{display:flex;flex-direction:column}
+ .summary-item{padding:8px}.summary-item img{width:40px;height:40px}
 }
 </style>
 </head>
 <body>
-<div class="backdrop" id="backdrop"></div>
-
+<div id="backdrop"></div>
 <header>
-  <div class="brand">
-    <div class="logo">◈</div>
-    <div>
-      <h1 data-i18n="title">LoL 隨機挑戰產生器 <small></small></h1>
-      <div class="subtitle" data-i18n="subtitle">隨機英雄・路線・符文・召喚師技能</div>
-    </div>
-  </div>
-  <div class="header-controls">
-    <select id="language" aria-label="Language">
-      <option value="zh_TW">繁體中文</option>
-      <option value="zh_CN">简体中文</option>
-      <option value="en_US">English</option>
-      <option value="ja_JP">日本語</option>
-      <option value="ko_KR">한국어</option>
-    </select>
-    <select id="themeSelect" aria-label="Theme"></select>
-    <label title="背景亮度">☀ <input id="brightness" type="range" min="35" max="140" value="100"></label>
-    <label title="背景遮罩">◐ <input id="shade" type="range" min="30" max="95" value="78"></label>
-  </div>
+ <div class="brand"><div class="logo">◈</div><div>
+  <h1 id="appTitle">LoL 隨機挑戰產生器</h1>
+  <div class="subtitle" id="subtitle">隨機英雄・路線・符文・召喚師技能</div>
+ </div></div>
+ <div class="controls">
+  <select id="lang" aria-label="Language">
+   <option value="zh_TW">繁體中文</option><option value="zh_CN">简体中文</option>
+   <option value="en_US">English</option><option value="ja_JP">日本語</option>
+   <option value="ko_KR">한국어</option>
+  </select>
+  <select id="themeSelect" aria-label="Background"></select>
+  <label title="背景亮度">☀ <input id="brightness" type="range" min="35" max="140" value="100"></label>
+  <label title="背景遮罩">◐ <input id="shade" type="range" min="30" max="95" value="78"></label>
+ </div>
 </header>
 
 <main>
-  <aside class="panel">
-    <h2 data-i18n="settings">⚙ 設定</h2>
-
-    <section class="section">
-      <h3 data-i18n="background">背景設定</h3>
-      <div id="themeList" class="theme-list"></div>
-      <label class="btn full" style="display:block;text-align:center">
-        <span data-i18n="upload">＋ 自訂背景圖片</span>
-        <input id="backgroundFile" type="file" accept="image/*" hidden>
-      </label>
-      <div class="info-text" data-i18n="backgroundNote">自訂背景會儲存在此瀏覽器。</div>
-    </section>
-
-    <section class="section">
-      <h3 data-i18n="rerollItems">抽選項目</h3>
-      <div class="check-list">
-        <label><input type="checkbox" data-key="champion" checked><span data-i18n="champion">英雄</span></label>
-        <label><input type="checkbox" data-key="lane" checked><span data-i18n="lane">路線</span></label>
-        <label><input type="checkbox" data-key="runes" checked><span data-i18n="runes">符文</span></label>
-        <label><input type="checkbox" data-key="spells" checked><span data-i18n="spells">召喚師技能</span></label>
-      </div>
-      <div class="info-text" data-i18n="selectionNote">只會重抽勾選的項目。</div>
-    </section>
-
-    <button class="btn primary full" id="randomize" data-i18n="randomize">🎲 開始抽選</button>
-    <button class="btn full" id="reset" data-i18n="reset">重設結果</button>
-  </aside>
-
-  <section>
-    <div class="results-top">
-      <h2 data-i18n="resultsTitle">🎲 你的隨機挑戰結果</h2>
-      <button class="btn small" id="unlockAll" data-i18n="unlockAll">解除全部鎖定</button>
-    </div>
-    <div class="summary-grid" id="summaryGrid"></div>
-    <div class="cards-grid" id="cardsGrid"></div>
-    <div class="card rune-card" id="runeCard"></div>
+ <aside class="panel">
+  <h2 id="settingsTitle">⚙ 設定</h2>
+  <section class="section">
+   <h3 id="backgroundTitle">背景主題</h3>
+   <div id="themeGrid" class="theme-grid"></div>
+   <label class="btn full" style="display:block;text-align:center">
+    <span id="uploadLabel">＋ 自訂背景圖片</span>
+    <input id="file" type="file" accept="image/*" hidden>
+   </label>
+   <div class="range"><label><span id="brightnessLabel">背景亮度</span><span id="brightnessValue">100%</span></label></div>
+   <div class="range"><label><span id="shadeLabel">遮罩強度</span><span id="shadeValue">78%</span></label></div>
   </section>
+  <section class="section">
+   <h3 id="rerollTitle">抽選項目</h3>
+   <div class="checks" id="checks">
+    <label><input type="checkbox" data-key="champion" checked><span data-t="champion">英雄</span></label>
+    <label><input type="checkbox" data-key="lane" checked><span data-t="lane">路線</span></label>
+    <label><input type="checkbox" data-key="runes" checked><span data-t="runes">符文</span></label>
+    <label><input type="checkbox" data-key="spells" checked><span data-t="spells">召喚師技能</span></label>
+   </div>
+   <p class="note" id="selectionNote">只有勾選且未鎖定的項目會重抽。</p>
+  </section>
+  <button id="randomize" class="btn primary full">🎲 開始抽選</button>
+  <button id="reset" class="btn full">↻ 重設結果</button>
+ </aside>
 
-  <aside class="rightbar" style="display:flex;flex-direction:column;gap:12px">
-    <section class="panel">
-      <h2 data-i18n="dataTitle">遊戲資料來源</h2>
-      <div id="dataStatus" class="status">等待載入…</div>
-      <button class="btn full" id="reloadData" data-i18n="reloadData">重新載入遊戲資料</button>
-    </section>
-    <section class="panel">
-      <h2 data-i18n="rulesTitle">❔ 隨機規則說明</h2>
-      <ol class="rule-list">
-        <li data-i18n="rule1">只有打野路線會出現重擊，且必定包含一個重擊。</li>
-        <li data-i18n="rule2">非打野路線不會出現重擊。</li>
-        <li data-i18n="rule3">符文包含主系、副系及三個屬性碎片。</li>
-        <li data-i18n="rule4">未勾選的項目不會主動重抽。</li>
-        <li data-i18n="rule5">已鎖定的項目不會被重抽。</li>
-      </ol>
-    </section>
-    <section class="panel">
-      <h2 data-i18n="tipTitle">💡 小提醒</h2>
-      <div class="info-text" data-i18n="tip">英雄與遊戲資料由 Riot Data Dragon 載入。屬性碎片選項由本程式維護。</div>
-    </section>
-  </aside>
+ <section>
+  <div class="topline"><h2 id="resultsTitle">🎲 你的隨機挑戰結果</h2>
+   <button class="btn small" id="unlockAll">🔓 解除全部鎖定</button></div>
+  <div id="summary" class="summary"></div>
+  <div id="cards" class="cards"></div>
+  <article id="runeCard" class="card runes"></article>
+ </section>
+
+ <aside class="rightbar">
+  <section class="panel">
+   <h2 id="dataTitle">▣ 遊戲資料來源</h2>
+   <div id="dataStatus" class="status">等待載入遊戲資料…</div>
+   <button id="reload" class="btn full">重新載入遊戲資料</button>
+  </section>
+  <section class="panel">
+   <h2 id="rulesTitle">❔ 隨機規則</h2>
+   <ol class="rules" id="rules"></ol>
+  </section>
+  <section class="panel">
+   <h2 id="tipsTitle">💡 小提醒</h2>
+   <p class="note" id="tips">遊戲資料由 Riot Data Dragon 提供。</p>
+  </section>
+ </aside>
 </main>
-
-<footer>LoL Random Challenge Generator · Riot Data Dragon</footer>
+<footer id="footer">LoL Random Challenge Generator · Riot Data Dragon</footer>
 <div id="toast" role="status"></div>
-<div id="loading"><div><div class="spinner">◈</div><h2 data-i18n="loading">正在載入遊戲資料…</h2><div id="loadingDetail" class="info-text">Data Dragon</div></div></div>
+<div id="loading"><div><div class="spinner">◈</div><h2 id="loadingTitle">正在載入遊戲資料…</h2><div class="status">Riot Data Dragon</div></div></div>
 
 <script>
 "use strict";
-
-const I18N = {
-zh_TW:{
- title:"LoL 隨機挑戰產生器",subtitle:"隨機英雄・路線・符文・召喚師技能",
- settings:"⚙ 設定",background:"背景設定",upload:"＋ 自訂背景圖片",
- backgroundNote:"自訂背景可能因瀏覽器儲存空間限制而無法保存。",
- rerollItems:"抽選項目",champion:"英雄",lane:"路線",runes:"符文",spells:"召喚師技能",
- selectionNote:"只會重抽勾選且未鎖定的項目。",randomize:"🎲 開始抽選",reset:"重設結果",
- resultsTitle:"🎲 你的隨機挑戰結果",unlockAll:"解除全部鎖定",dataTitle:"遊戲資料來源",
- reloadData:"重新載入遊戲資料",rulesTitle:"❔ 隨機規則說明",
- rule1:"只有打野路線會出現重擊，且必定包含一個重擊。",
- rule2:"非打野路線不會出現重擊。",rule3:"符文包含主系、副系及三個屬性碎片。",
- rule4:"未勾選的項目不會主動重抽。",rule5:"已鎖定的項目不會被重抽。",
- tipTitle:"💡 小提醒",tip:"英雄與遊戲資料由 Riot Data Dragon 載入。屬性碎片選項由本程式維護。",
- loading:"正在載入遊戲資料…",loadFail:"資料載入失敗，請檢查網路後重試。",
- themes:["召喚峽谷","暮光之森","星光幻境","暗色模式"],primary:"主系",secondary:"副系",
- shards:"屬性碎片",reroll:"重新抽選",lock:"鎖定",unlock:"解除鎖定",locked:"已鎖定",
- laneNames:["上路","打野","中路","下路","輔助"],allLanes:"所有路線",
- dataVersion:"資料版本",loadingStatus:"正在載入",loaded:"資料已載入",error:"錯誤",
- noSelection:"請至少勾選一個抽選項目。",noData:"遊戲資料尚未載入。",
- lockedMsg:"此項目已鎖定。",incompatible:"目前路線與召喚師技能鎖定狀態衝突，無法變更路線。",
- empty:"沒有可用資料。",noChampion:"英雄資料不存在",noRune:"符文資料不存在",
- statAdaptive:"適性之力",statAttackSpeed:"攻擊速度",statAbilityHaste:"技能急速",
- statMoveSpeed:"移動速度",statHealth:"生命",statTenacity:"韌性與緩速抗性",statHealthScale:"成長生命",
- custom:"自訂圖片",saveError:"瀏覽器儲存空間不足，設定無法完整保存。"
-},
-zh_CN:{
- title:"LoL 随机挑战生成器",subtitle:"随机英雄・路线・符文・召唤师技能",
- settings:"⚙ 设置",background:"背景设置",upload:"＋ 自定义背景图片",
- backgroundNote:"自定义背景可能因浏览器存储空间限制而无法保存。",
- rerollItems:"抽选项目",champion:"英雄",lane:"路线",runes:"符文",spells:"召唤师技能",
- selectionNote:"只会重抽已勾选且未锁定的项目。",randomize:"🎲 开始抽选",reset:"重置结果",
- resultsTitle:"🎲 你的随机挑战结果",unlockAll:"解除全部锁定",dataTitle:"游戏数据来源",
- reloadData:"重新加载游戏数据",rulesTitle:"❔ 随机规则说明",
- rule1:"只有打野路线会出现惩戒，且必定包含一个惩戒。",
- rule2:"非打野路线不会出现惩戒。",rule3:"符文包含主系、副系及三个属性碎片。",
- rule4:"未勾选的项目不会主动重抽。",rule5:"已锁定的项目不会被重抽。",
- tipTitle:"💡 提醒",tip:"英雄与游戏资料由 Riot Data Dragon 加载。属性碎片选项由本程序维护。",
- loading:"正在加载游戏数据…",loadFail:"数据加载失败，请检查网络后重试。",
- themes:["召唤师峡谷","暮光之森","星光幻境","暗色模式"],primary:"主系",secondary:"副系",
- shards:"属性碎片",reroll:"重新抽选",lock:"锁定",unlock:"解除锁定",locked:"已锁定",
- laneNames:["上路","打野","中路","下路","辅助"],allLanes:"所有路线",
- dataVersion:"数据版本",loadingStatus:"正在加载",loaded:"数据已加载",error:"错误",
- noSelection:"请至少勾选一个抽选项目。",noData:"游戏数据尚未加载。",
- lockedMsg:"此项目已锁定。",incompatible:"当前路线与召唤师技能锁定状态冲突，无法变更路线。",
- empty:"没有可用数据。",noChampion:"英雄数据不存在",noRune:"符文数据不存在",
- statAdaptive:"适应之力",statAttackSpeed:"攻击速度",statAbilityHaste:"技能急速",
- statMoveSpeed:"移动速度",statHealth:"生命",statTenacity:"韧性与减速抗性",statHealthScale:"成长生命",
- custom:"自定义图片",saveError:"浏览器存储空间不足，设置无法完整保存。"
-},
-en_US:{
- title:"LoL Random Challenge Generator",subtitle:"Random champions · lanes · runes · summoner spells",
- settings:"⚙ Settings",background:"Background",upload:"＋ Custom background image",
- backgroundNote:"Custom backgrounds may exceed browser storage limits.",
- rerollItems:"Randomize items",champion:"Champion",lane:"Lane",runes:"Runes",spells:"Summoner spells",
- selectionNote:"Only selected and unlocked items will reroll.",randomize:"🎲 Randomize",reset:"Reset results",
- resultsTitle:"🎲 Your random challenge",unlockAll:"Unlock all",dataTitle:"Game data source",
- reloadData:"Reload game data",rulesTitle:"❔ Rules",
- rule1:"Smite appears only in jungle, and jungle always includes Smite.",
- rule2:"Non-jungle lanes never have Smite.",rule3:"Runes include primary, secondary, and three stat shards.",
- rule4:"Unselected items are not intentionally rerolled.",rule5:"Locked items will not reroll.",
- tipTitle:"💡 Note",tip:"Champion and game data load from Riot Data Dragon. Stat shard options are maintained by this app.",
- loading:"Loading game data…",loadFail:"Failed to load data. Check your connection and retry.",
- themes:["Summoner's Rift","Twilight","Starlight","Dark mode"],primary:"Primary",secondary:"Secondary",
- shards:"Stat shards",reroll:"Reroll",lock:"Lock",unlock:"Unlock",locked:"Locked",
- laneNames:["Top","Jungle","Middle","Bottom","Support"],allLanes:"All lanes",
- dataVersion:"Data version",loadingStatus:"Loading",loaded:"Data loaded",error:"Error",
- noSelection:"Select at least one item to reroll.",noData:"Game data has not loaded.",
- lockedMsg:"This item is locked.",incompatible:"The lane conflicts with your locked summoner spells.",
- empty:"No available data.",noChampion:"Champion data unavailable",noRune:"Rune data unavailable",
- statAdaptive:"Adaptive Force",statAttackSpeed:"Attack Speed",statAbilityHaste:"Ability Haste",
- statMoveSpeed:"Move Speed",statHealth:"Health",statTenacity:"Tenacity and Slow Resist",statHealthScale:"Scaling Health",
- custom:"Custom image",saveError:"Browser storage is full; settings could not be fully saved."
-},
-ja_JP:{
- title:"LoL ランダムチャレンジ",subtitle:"ランダムチャンピオン・レーン・ルーン・サモナースペル",
- settings:"⚙ 設定",background:"背景設定",upload:"＋ 背景画像を選択",
- backgroundNote:"画像はブラウザの保存容量を超える場合があります。",
- rerollItems:"抽選項目",champion:"チャンピオン",lane:"レーン",runes:"ルーン",spells:"サモナースペル",
- selectionNote:"選択済みかつロックされていない項目のみ再抽選します。",randomize:"🎲 抽選開始",reset:"結果をリセット",
- resultsTitle:"🎲 ランダムチャレンジ結果",unlockAll:"すべて解除",dataTitle:"ゲームデータ",
- reloadData:"ゲームデータを再読み込み",rulesTitle:"❔ ルール",
- rule1:"ジャングルのみスマイトが出現し、必ず1つ含まれます。",
- rule2:"ジャングル以外ではスマイトは出現しません。",
- rule3:"ルーンはメイン、サブ、3つのステータスシャードを含みます。",
- rule4:"未選択の項目は再抽選しません。",rule5:"ロックされた項目は再抽選しません。",
- tipTitle:"💡 ヒント",tip:"データは Riot Data Dragon から取得します。シャード選択肢はアプリ内で管理します。",
- loading:"ゲームデータを読み込み中…",loadFail:"読み込み失敗。ネットワークを確認してください。",
- themes:["サモナーズリフト","トワイライト","スターライト","ダーク"],primary:"メイン",secondary:"サブ",
- shards:"ステータスシャード",reroll:"再抽選",lock:"ロック",unlock:"解除",locked:"ロック中",
- laneNames:["トップ","ジャングル","ミッド","ボット","サポート"],allLanes:"全レーン",
- dataVersion:"データバージョン",loadingStatus:"読み込み中",loaded:"読み込み完了",error:"エラー",
- noSelection:"抽選項目を選択してください。",noData:"ゲームデータが未読み込みです。",
- lockedMsg:"この項目はロックされています。",incompatible:"ロックされたスペルとレーンが競合しています。",
- empty:"データがありません。",noChampion:"チャンピオンデータなし",noRune:"ルーンデータなし",
- statAdaptive:"アダプティブフォース",statAttackSpeed:"攻撃速度",statAbilityHaste:"スキルヘイスト",
- statMoveSpeed:"移動速度",statHealth:"体力",statTenacity:"強靭とスロウ耐性",statHealthScale:"スケーリング体力",
- custom:"カスタム画像",saveError:"ブラウザの保存容量が不足しています。"
-},
-ko_KR:{
- title:"LoL 랜덤 챌린지 생성기",subtitle:"랜덤 챔피언 · 라인 · 룬 · 소환사 주문",
- settings:"⚙ 설정",background:"배경 설정",upload:"＋ 사용자 지정 배경 이미지",
- backgroundNote:"이미지가 브라우저 저장 공간을 초과할 수 있습니다.",
- rerollItems:"추첨 항목",champion:"챔피언",lane:"라인",runes:"룬",spells:"소환사 주문",
- selectionNote:"선택되고 잠기지 않은 항목만 다시 추첨합니다.",randomize:"🎲 추첨 시작",reset:"결과 초기화",
- resultsTitle:"🎲 랜덤 챌린지 결과",unlockAll:"모두 잠금 해제",dataTitle:"게임 데이터",
- reloadData:"게임 데이터 다시 불러오기",rulesTitle:"❔ 규칙",
- rule1:"정글에서만 강타가 나오며 반드시 하나 포함됩니다.",
- rule2:"정글이 아닌 라인에는 강타가 없습니다.",
- rule3:"룬에는 주 룬, 보조 룬, 능력치 파편 3개가 포함됩니다.",
- rule4:"선택하지 않은 항목은 다시 추첨하지 않습니다.",rule5:"잠긴 항목은 다시 추첨하지 않습니다.",
- tipTitle:"💡 안내",tip:"챔피언 데이터는 Riot Data Dragon에서 불러옵니다. 능력치 파편은 앱에서 관리합니다.",
- loading:"게임 데이터 불러오는 중…",loadFail:"데이터 로드 실패. 네트워크를 확인하세요.",
- themes:["소환사의 협곡","황혼","별빛","다크 모드"],primary:"주 룬",secondary:"보조 룬",
- shards:"능력치 파편",reroll:"다시 추첨",lock:"잠금",unlock:"잠금 해제",locked:"잠김",
- laneNames:["탑","정글","미드","바텀","서포터"],allLanes:"모든 라인",
- dataVersion:"데이터 버전",loadingStatus:"불러오는 중",loaded:"데이터 로드 완료",error:"오류",
- noSelection:"추첨할 항목을 하나 이상 선택하세요.",noData:"게임 데이터가 아직 로드되지 않았습니다.",
- lockedMsg:"이 항목은 잠겨 있습니다.",incompatible:"잠긴 소환사 주문과 라인이 충돌합니다.",
- empty:"사용 가능한 데이터가 없습니다.",noChampion:"챔피언 데이터 없음",noRune:"룬 데이터 없음",
- statAdaptive:"적응형 능력치",statAttackSpeed:"공격 속도",statAbilityHaste:"스킬 가속",
- statMoveSpeed:"이동 속도",statHealth:"체력",statTenacity:"강인함 및 둔화 저항",statHealthScale:"성장 체력",
- custom:"사용자 이미지",saveError:"브라우저 저장 공간이 부족합니다."
-}
+const LANG={
+zh_TW:{title:"LoL 隨機挑戰產生器",subtitle:"隨機英雄・路線・符文・召喚師技能",settings:"⚙ 設定",background:"背景主題",upload:"＋ 自訂背景圖片",brightness:"背景亮度",shade:"遮罩強度",rerollTitle:"抽選項目",champion:"英雄",lane:"路線",runes:"符文",spells:"召喚師技能",selection:"只有勾選且未鎖定的項目會重抽。",randomize:"🎲 開始抽選",reset:"↻ 重設結果",results:"🎲 你的隨機挑戰結果",unlockAll:"🔓 解除全部鎖定",data:"▣ 遊戲資料來源",reload:"重新載入遊戲資料",rulesTitle:"❔ 隨機規則",tipsTitle:"💡 小提醒",tips:"英雄與符文由 Riot Data Dragon 載入。屬性碎片選項由程式維護。",loading:"正在載入遊戲資料…",loaded:"資料已載入",failed:"資料載入失敗，請檢查網路後重試。",primary:"主系",secondary:"副系",shards:"屬性碎片",reroll:"重新抽選",lock:"鎖定",unlock:"解除鎖定",locked:"已鎖定",lanes:["上路","打野","中路","下路","輔助"],themes:["召喚峽谷","暮光獵影","星光幻境","暗色模式"],rules:["只有打野路線會出現重擊，且必定包含重擊。","非打野路線不會出現重擊。","符文包含主系、副系與三個屬性碎片。","只有勾選的項目會重抽；未勾選的項目保持不變。","已鎖定的項目不會重抽。","切換語言與背景不會主動清除結果。"],adaptive:"適性之力",attackSpeed:"攻擊速度",haste:"技能急速",move:"移動速度",health:"生命",tenacity:"韌性與緩速抗性",scaling:"成長生命",noData:"遊戲資料尚未載入。",noSelection:"請至少勾選一個未鎖定項目。",conflict:"鎖定的召喚師技能與路線衝突，無法重抽。"},
+zh_CN:{title:"LoL 随机挑战生成器",subtitle:"随机英雄・路线・符文・召唤师技能",settings:"⚙ 设置",background:"背景主题",upload:"＋ 自定义背景图片",brightness:"背景亮度",shade:"遮罩强度",rerollTitle:"抽选项目",champion:"英雄",lane:"路线",runes:"符文",spells:"召唤师技能",selection:"只有勾选且未锁定的项目会重抽。",randomize:"🎲 开始抽选",reset:"↻ 重置结果",results:"🎲 你的随机挑战结果",unlockAll:"🔓 解除全部锁定",data:"▣ 游戏数据来源",reload:"重新加载游戏数据",rulesTitle:"❔ 随机规则",tipsTitle:"💡 提醒",tips:"游戏数据来自 Riot Data Dragon。属性碎片由程序维护。",loading:"正在加载游戏数据…",loaded:"数据已加载",failed:"数据加载失败，请检查网络后重试。",primary:"主系",secondary:"副系",shards:"属性碎片",reroll:"重新抽选",lock:"锁定",unlock:"解除锁定",locked:"已锁定",lanes:["上路","打野","中路","下路","辅助"],themes:["召唤师峡谷","暮光猎影","星光幻境","暗色模式"],rules:["只有打野路线会出现惩戒，且必定包含惩戒。","非打野路线不会出现惩戒。","符文包含主系、副系和三个属性碎片。","只有勾选的项目会重抽。","已锁定的项目不会重抽。","切换语言或背景不会主动清除结果。"],adaptive:"适应之力",attackSpeed:"攻击速度",haste:"技能急速",move:"移动速度",health:"生命",tenacity:"韧性与减速抗性",scaling:"成长生命",noData:"游戏数据尚未加载。",noSelection:"请至少选择一个未锁定项目。",conflict:"锁定的召唤师技能与路线冲突。"},
+en_US:{title:"LoL Random Challenge Generator",subtitle:"Random champions · lanes · runes · summoner spells",settings:"⚙ Settings",background:"Background themes",upload:"＋ Custom background",brightness:"Brightness",shade:"Overlay strength",rerollTitle:"Randomize items",champion:"Champion",lane:"Lane",runes:"Runes",spells:"Summoner spells",selection:"Only selected, unlocked items will reroll.",randomize:"🎲 Randomize",reset:"↻ Reset results",results:"🎲 Your random challenge",unlockAll:"🔓 Unlock all",data:"▣ Game data source",reload:"Reload game data",rulesTitle:"❔ Rules",tipsTitle:"💡 Note",tips:"Champion and rune data load from Riot Data Dragon. Stat shard options are maintained by this app.",loading:"Loading game data…",loaded:"Data loaded",failed:"Failed to load data. Check your connection.",primary:"Primary",secondary:"Secondary",shards:"Stat shards",reroll:"Reroll",lock:"Lock",unlock:"Unlock",locked:"Locked",lanes:["Top","Jungle","Middle","Bottom","Support"],themes:["Summoner's Rift","Twilight","Starlight","Dark mode"],rules:["Jungle always includes Smite.","Non-jungle lanes never include Smite.","Runes include primary, secondary, and three stat shards.","Only selected items reroll.","Locked items never reroll.","Changing language or background preserves results."],adaptive:"Adaptive Force",attackSpeed:"Attack Speed",haste:"Ability Haste",move:"Move Speed",health:"Health",tenacity:"Tenacity and Slow Resist",scaling:"Scaling Health",noData:"Game data has not loaded.",noSelection:"Select an unlocked item to reroll.",conflict:"Locked summoner spells conflict with the selected lane."},
+ja_JP:{title:"LoL ランダムチャレンジ",subtitle:"チャンピオン・レーン・ルーン・サモナースペル",settings:"⚙ 設定",background:"背景テーマ",upload:"＋ 背景画像",brightness:"明るさ",shade:"オーバーレイ",rerollTitle:"抽選項目",champion:"チャンピオン",lane:"レーン",runes:"ルーン",spells:"サモナースペル",selection:"選択済みかつロックされていない項目のみ再抽選します。",randomize:"🎲 抽選開始",reset:"↻ 結果をリセット",results:"🎲 チャレンジ結果",unlockAll:"🔓 すべて解除",data:"▣ ゲームデータ",reload:"データを再読み込み",rulesTitle:"❔ ルール",tipsTitle:"💡 ヒント",tips:"データは Riot Data Dragon から取得します。",loading:"データを読み込み中…",loaded:"読み込み完了",failed:"読み込み失敗。ネットワークを確認してください。",primary:"メイン",secondary:"サブ",shards:"ステータスシャード",reroll:"再抽選",lock:"ロック",unlock:"解除",locked:"ロック中",lanes:["トップ","ジャングル","ミッド","ボット","サポート"],themes:["サモナーズリフト","トワイライト","スターライト","ダーク"],rules:["ジャングルでは必ずスマイトを含みます。","ジャングル以外ではスマイトは出ません。","ルーンには3つのシャードが含まれます。","選択項目のみ再抽選します。","ロック中の項目は変更しません。","言語と背景の変更で結果は消えません。"],adaptive:"アダプティブ",attackSpeed:"攻撃速度",haste:"スキルヘイスト",move:"移動速度",health:"体力",tenacity:"強靭とスロウ耐性",scaling:"スケーリング体力",noData:"データ未読み込み",noSelection:"項目を選択してください",conflict:"ロック中のスペルとレーンが競合しています。"},
+ko_KR:{title:"LoL 랜덤 챌린지 생성기",subtitle:"챔피언 · 라인 · 룬 · 소환사 주문",settings:"⚙ 설정",background:"배경 테마",upload:"＋ 배경 이미지",brightness:"밝기",shade:"오버레이",rerollTitle:"추첨 항목",champion:"챔피언",lane:"라인",runes:"룬",spells:"소환사 주문",selection:"선택되고 잠기지 않은 항목만 다시 추첨합니다.",randomize:"🎲 추첨 시작",reset:"↻ 결과 초기화",results:"🎲 랜덤 챌린지 결과",unlockAll:"🔓 모두 잠금 해제",data:"▣ 게임 데이터",reload:"게임 데이터 다시 불러오기",rulesTitle:"❔ 규칙",tipsTitle:"💡 안내",tips:"데이터는 Riot Data Dragon에서 불러옵니다.",loading:"데이터 불러오는 중…",loaded:"데이터 로드 완료",failed:"데이터 로드 실패. 네트워크를 확인하세요.",primary:"주 룬",secondary:"보조 룬",shards:"능력치 파편",reroll:"다시 추첨",lock:"잠금",unlock:"잠금 해제",locked:"잠김",lanes:["탑","정글","미드","바텀","서포터"],themes:["소환사의 협곡","황혼","별빛","다크"],rules:["정글에는 강타가 반드시 포함됩니다.","정글이 아니면 강타가 없습니다.","룬에는 능력치 파편 3개가 포함됩니다.","선택한 항목만 다시 추첨합니다.","잠긴 항목은 변경하지 않습니다.","언어와 배경을 바꿔도 결과는 유지됩니다."],adaptive:"적응형 능력치",attackSpeed:"공격 속도",haste:"스킬 가속",move:"이동 속도",health:"체력",tenacity:"강인함 및 둔화 저항",scaling:"성장 체력",noData:"게임 데이터가 없습니다.",noSelection:"항목을 선택하세요.",conflict:"잠긴 주문과 라인이 충돌합니다."}
 };
 
-const LANES = ["top","jungle","middle","bottom","support"];
-const THEMES = [
+const LANES=["top","jungle","middle","bottom","support"];
+const THEMES=[
  {id:"rift",url:"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg"},
  {id:"twilight",url:"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Kindred_0.jpg"},
- {id:"starlight",url:"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Soraka_0.jpg"},
+ {id:"star",url:"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Soraka_0.jpg"},
  {id:"dark",url:""}
 ];
-
-// Riot Data Dragon does not publish stat shard definitions in runesReforged.json.
-// Keep the shard IDs and legal row groups here, separate from rune-tree data.
-const SHARD_ROWS = [
- ["5008","5005","5007"],
- ["5008","5010","5001"],
- ["5011","5013","5001"]
+const SHARDS=[
+ [["5008","adaptive"],["5005","attackSpeed"],["5007","haste"]],
+ [["5008","adaptive"],["5010","move"],["5001","scaling"]],
+ [["5011","health"],["5013","tenacity"],["5001","scaling"]]
 ];
-const SHARD_KEYS = {
- "5008":"statAdaptive","5005":"statAttackSpeed","5007":"statAbilityHaste",
- "5010":"statMoveSpeed","5001":"statHealthScale","5011":"statHealth","5013":"statTenacity"
-};
-
-const DEFAULT_STATE = {
- language:"zh_TW", theme:"rift", customBackground:"",
- brightness:100, shade:78,
+const DEFAULT={lang:"zh_TW",theme:"rift",custom:"",brightness:100,shade:78,
  selected:{champion:true,lane:true,runes:true,spells:true},
  locks:{champion:false,lane:false,runes:false,spells:false},
- results:{champion:null,lane:null,runes:null,spells:null}
-};
-
-let state = loadState();
-let game = null;
-let busy = false;
-let requestId = 0;
-let toastTimer;
-
-function loadState(){
- try {
-  const raw = localStorage.getItem("lol-random-v2");
-  if(!raw) return structuredClone(DEFAULT_STATE);
-  const s = JSON.parse(raw);
-  return {
-   ...structuredClone(DEFAULT_STATE), ...s,
-   selected:{...DEFAULT_STATE.selected,...s.selected},
-   locks:{...DEFAULT_STATE.locks,...s.locks},
-   results:{...DEFAULT_STATE.results,...s.results}
-  };
- } catch { return structuredClone(DEFAULT_STATE); }
-}
-function saveState(){
- try { localStorage.setItem("lol-random-v2", JSON.stringify(state)); }
- catch { toast(t().saveError); }
-}
-function t(){ return I18N[state.language] || I18N.zh_TW; }
-function esc(v){
- return String(v ?? "").replace(/[&<>"']/g, c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- }[c]));
-}
-function pick(arr){
- return Array.isArray(arr) && arr.length ? arr[Math.floor(Math.random()*arr.length)] : null;
-}
-function shuffle(arr){
- const a=[...arr];
- for(let i=a.length-1;i>0;i--){
-  const j=Math.floor(Math.random()*(i+1));
-  [a[i],a[j]]=[a[j],a[i]];
- }
- return a;
-}
-function toast(message){
- const el=document.getElementById("toast");
- el.textContent=message;
- el.style.display="block";
- clearTimeout(toastTimer);
- toastTimer=setTimeout(()=>el.style.display="none",3000);
-}
-function showLoading(on, message){
- document.getElementById("loading").style.display=on?"grid":"none";
- if(message) document.getElementById("loadingDetail").textContent=message;
- document.querySelectorAll("button").forEach(b=>{
-  if(b.id!=="unlockAll") b.disabled=on;
- });
-}
-function setStatus(message, kind=""){
- const el=document.getElementById("dataStatus");
- el.className="status "+kind;
- el.textContent=message;
-}
+ results:{champion:null,lane:null,runes:null,spells:null}};
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadState(){try{const x=JSON.parse(localStorage.getItem("lolchallenge"));return {...clone(DEFAULT),...x,selected:{...DEFAULT.selected,...x.selected},locks:{...DEFAULT.locks,...x.locks},results:{...DEFAULT.results,...x.results}}}catch{return clone(DEFAULT)}}
+let state=loadState(),game=null,request=0,timer;
+const t=()=>LANG[state.lang]||LANG.zh_TW;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pick=a=>a?.length?a[Math.floor(Math.random()*a.length)]:null;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function save(){try{localStorage.setItem("lolchallenge",JSON.stringify(state))}catch{toast("Storage full. Background may not persist.")}}
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";clearTimeout(timer);timer=setTimeout(()=>$("toast").style.display="none",2800)}
+function showLoading(v){$("loading").style.display=v?"grid":"none";document.querySelectorAll("button").forEach(b=>b.disabled=v)}
+function status(s,cls=""){$("dataStatus").className="status "+cls;$("dataStatus").textContent=s}
 function updateBackdrop(){
- const theme=THEMES.find(x=>x.id===state.theme);
- const url=state.customBackground || (theme && theme.url) || "";
- const el=document.getElementById("backdrop");
- el.style.backgroundImage=url ? `url("${url.replace(/"/g,"%22")}")` : "none";
- el.style.backgroundColor=state.theme==="dark"?"#050a12":"#101e30";
- el.style.filter=`brightness(${Number(state.brightness)/100})`;
- el.style.setProperty("--shade",Number(state.shade)/100);
- document.getElementById("brightness").value=state.brightness;
- document.getElementById("shade").value=state.shade;
+ const th=THEMES.find(x=>x.id===state.theme);
+ const url=state.custom||(th&&th.url)||"";
+ $("backdrop").style.backgroundImage=url?`url("${url}")`:"none";
+ $("backdrop").style.backgroundColor=state.theme==="dark"?"#040914":"#10233a";
+ $("backdrop").style.filter=`brightness(${state.brightness/100})`;
+ $("backdrop").style.setProperty("--shade",state.shade/100);
+ $("brightness").value=state.brightness;$("shade").value=state.shade;
+ $("brightnessValue").textContent=state.brightness+"%";$("shadeValue").textContent=state.shade+"%";
 }
-function iconUrl(path){
- if(!path) return "";
- return path.startsWith("http") ? path :
-  `https://ddragon.leagueoflegends.com/cdn/${game.version}/img/${path}`;
+const champion=id=>game?.champions.find(x=>x.id===id);
+const spell=id=>game?.spells.find(x=>x.id===id);
+const tree=id=>game?.treeMap[String(id)];
+const rune=id=>game?.runeMap[String(id)];
+const jungle=()=>state.results.lane==="jungle";
+function randChampion(){return pick(game.champions)?.id}
+function randLane(){
+ let lanes=LANES;
+ const spells=state.results.spells||[];
+ const canChangeSpells=state.selected.spells&&!state.locks.spells;
+ if(!canChangeSpells)lanes=LANES.filter(l=>spells.includes("SummonerSmite")?l==="jungle":l!=="jungle");
+ return pick(lanes)||"middle";
 }
-function runeIconUrl(path){
- if(!path) return "";
- return path.startsWith("http") ? path :
-  `https://ddragon.leagueoflegends.com/cdn/img/${path}`;
+function randSpells(){
+ const other=game.spells.filter(s=>s.id!=="SummonerSmite");
+ if(jungle()){const smite=spell("SummonerSmite");const second=pick(other);return smite&&second?[smite.id,second.id]:[]}
+ return shuffle(other).slice(0,2).map(x=>x.id);
 }
-function championById(id){ return game?.championMap?.[id] || null; }
-function spellById(id){ return game?.spellMap?.[id] || null; }
-function treeById(id){ return game?.treeMap?.[id] || null; }
-function runeById(id){ return game?.runeMap?.[id] || null; }
-function isJungle(){ return state.results.lane==="jungle"; }
-
-function randomChampion(){
- const values=game?.champions || [];
- const item=pick(values);
- return item ? item.id : null;
+function randRunes(){
+ const trees=game.trees,primary=pick(trees);
+ if(!primary)return null;
+ const secondary=pick(trees.filter(x=>x.id!==primary.id));
+ if(!secondary)return null;
+ const pr=[];
+ for(const slot of primary.slots){const r=pick(slot.runes);if(r)pr.push(r.id)}
+ const sec=[];
+ for(let i=1;i<Math.min(4,secondary.slots.length);i++){const r=pick(secondary.slots[i].runes);if(r)sec.push(r.id)}
+ const sr=shuffle(sec).slice(0,2);
+ if(pr.length!==4||sr.length!==2)return null;
+ return {primary:primary.id,secondary:secondary.id,pr,sr,shards:SHARDS.map(row=>pick(row)[0])};
 }
-function randomLane(){
- // When spells are unchanged or locked, keep the new lane compatible with them.
- const spells=state.results.spells || [];
- const hasSmite=spells.includes("SummonerSmite");
- const spellMayChange=state.selected.spells && !state.locks.spells;
- let candidates=LANES;
- if(!spellMayChange) candidates=LANES.filter(x=>hasSmite ? x==="jungle" : x!=="jungle");
- return pick(candidates) || "middle";
-}
-function randomSpells(){
- const spells=(game?.spells || []).filter(s=>s.id!=="SummonerSmite");
- if(isJungle()){
-  const smite=spellById("SummonerSmite");
-  const other=pick(spells);
-  return smite && other ? [smite.id,other.id] : [];
- }
- return shuffle(spells).slice(0,2).map(s=>s.id);
-}
-function randomRunePage(){
- const trees=game?.trees || [];
- if(trees.length<2) return null;
- const primary=pick(trees);
- const secondary=pick(trees.filter(x=>String(x.id)!==String(primary.id)));
- if(!primary || !secondary) return null;
-
- const primarySlots=primary.slots || [];
- const primaryRunes=[];
- for(const slot of primarySlots){
-  const r=pick(slot.runes || []);
-  if(r) primaryRunes.push(r.id);
- }
- if(primaryRunes.length!==4) return null;
-
- // Pick two runes from two different secondary rows, excluding the keystone row.
- const secChoices=[];
- for(let i=1;i<Math.min(4,(secondary.slots||[]).length);i++){
-  const r=pick(secondary.slots[i].runes || []);
-  if(r) secChoices.push({row:i,id:r.id});
- }
- const chosenRows=shuffle(secChoices).slice(0,2);
- if(chosenRows.length!==2) return null;
-
- return {
-  primary:String(primary.id), secondary:String(secondary.id),
-  primaryRunes, secondaryRunes:chosenRows.map(x=>x.id),
-  shards:SHARD_ROWS.map(row=>pick(row))
- };
-}
-function validSavedResults(){
- if(!game) return;
+function initializeResults(){
  const r=state.results;
- if(r.champion && !championById(r.champion)) r.champion=null;
- if(r.lane && !LANES.includes(r.lane)) r.lane=null;
- if(r.spells && (!Array.isArray(r.spells) || r.spells.some(id=>!spellById(id)))) r.spells=null;
- if(r.runes && (!treeById(r.runes.primary)||!treeById(r.runes.secondary))) r.runes=null;
- if(!r.lane) r.lane="middle";
- if(!r.champion) r.champion=randomChampion();
- if(!r.runes) r.runes=randomRunePage();
- if(!r.spells) r.spells=randomSpells();
- // Enforce jungle/smite consistency on initial restoration, unless locked state makes it impossible.
+ if(!r.lane)r.lane="middle";
+ if(!champion(r.champion))r.champion=randChampion();
+ if(!r.runes||!tree(r.runes.primary)||!tree(r.runes.secondary))r.runes=randRunes();
+ if(!Array.isArray(r.spells)||r.spells.some(id=>!spell(id)))r.spells=randSpells();
  if(!state.locks.spells){
-  const hasSmite=r.spells.includes("SummonerSmite");
-  if(isJungle() && !hasSmite) r.spells=randomSpells();
-  if(!isJungle() && hasSmite) r.spells=randomSpells();
+  const smite=r.spells.includes("SummonerSmite");
+  if(jungle()&&!smite)r.spells=randSpells();
+  if(!jungle()&&smite)r.spells=randSpells();
  }
 }
-function getSelectedKeys(){
- return ["champion","lane","runes","spells"].filter(k=>state.selected[k]&&!state.locks[k]);
+function actions(key){return `<div class="actions"><button class="btn small" data-act="reroll" data-key="${key}">↻ ${esc(t().reroll)}</button><button class="btn small" data-act="lock" data-key="${key}">${state.locks[key]?"🔒 "+esc(t().unlock):"🔓 "+esc(t().lock)}</button></div>`}
+function renderTree(id,ids,label){
+ const tr=tree(id);if(!tr)return "";
+ return `<div><div class="tree-head"><img src="https://ddragon.leagueoflegends.com/cdn/img/${esc(tr.icon)}" alt=""><span>${esc(label)}：${esc(tr.name)}</span></div><div class="rune-list">${ids.map(id=>{const r=rune(id);return r?`<div class="rune-item"><img src="https://ddragon.leagueoflegends.com/cdn/img/${esc(r.icon)}" alt=""><div>${esc(r.name)}<small>${esc((r.shortDesc||"").replace(/<[^>]*>/g," ").slice(0,75))}</small></div></div>`:""}).join("")}</div></div>`;
+}
+function render(){
+ if(!game)return;
+ const c=champion(state.results.champion),laneIndex=LANES.indexOf(state.results.lane),r=state.results.runes;
+ const p=tree(r?.primary),s=tree(r?.secondary);
+ $("summary").innerHTML=`
+ <div class="panel summary-item">${c?`<img src="${cdn()}/img/champion/${esc(c.image.full)}" alt="">`:""}<div><small>${esc(t().champion)}</small><strong>${esc(c?.name||"—")}</strong></div></div>
+ <div class="panel summary-item"><span class="summary-icon">⚔</span><div><small>${esc(t().lane)}</small><strong>${esc(t().lanes[laneIndex]||"—")}</strong></div></div>
+ <div class="panel summary-item"><span class="summary-icon">✦</span><div><small>${esc(t().runes)}</small><strong>${esc(p?.name||"—")} / ${esc(s?.name||"—")}</strong></div></div>
+ <div class="panel summary-item"><span class="summary-icon">✧</span><div><small>${esc(t().spells)}</small><strong>${esc((state.results.spells||[]).map(id=>spell(id)?.name||id).join(" + "))}</strong></div></div>`;
+ $("cards").innerHTML=`
+ <article class="card ${state.locks.champion?"locked":""}"><div class="card-title">✦ ${esc(t().champion)} ${state.locks.champion?"🔒":""}</div>${c?`<img class="splash" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${esc(c.id)}_0.jpg" alt="${esc(c.name)}"><div class="hero-name">${esc(c.name)}</div><div class="muted">${esc(c.title)}</div>`:""}${actions("champion")}</article>
+ <article class="card ${state.locks.lane?"locked":""}"><div class="card-title">⌖ ${esc(t().lane)} ${state.locks.lane?"🔒":""}</div><div class="lane-symbol">${["⇧","⚔","◇","⇩","♧"][laneIndex]||"◇"}</div><div class="center"><h2>${esc(t().lanes[laneIndex]||"—")}</h2><div class="muted">${jungle()?"Smite required":""}</div></div>${actions("lane")}</article>
+ <article class="card ${state.locks.spells?"locked":""}"><div class="card-title">✧ ${esc(t().spells)} ${state.locks.spells?"🔒":""}</div><div class="spells">${(state.results.spells||[]).map(id=>{const x=spell(id);return x?`<div class="spell"><img src="${cdn()}/img/spell/${esc(x.image.full)}" alt=""><strong>${esc(x.name)}</strong><small class="muted">${esc((x.description||"").replace(/<[^>]*>/g," ").slice(0,65))}</small></div>`:""}).join("")}</div>${actions("spells")}</article>`;
+ const shardText=(r?.shards||[]).map(id=>{
+  const entry=SHARDS.flat().find(x=>x[0]===id);
+  const key=entry?.[1]||"adaptive";
+  return `<div class="shard"><span class="shard-icon">✦</span><span>${esc(t()[key])}</span></div>`;
+ }).join("");
+ $("runeCard").className="card runes "+(state.locks.runes?"locked":"");
+ $("runeCard").innerHTML=`<div class="card-title">✧ ${esc(t().runes)} ${state.locks.runes?"🔒":""}</div><div class="rune-layout">${renderTree(r?.primary,r?.pr||[],t().primary)}${renderTree(r?.secondary,r?.sr||[],t().secondary)}<div class="shards"><strong>${esc(t().shards)}</strong>${shardText}</div></div>${actions("runes")}`;
+ updateBackdrop();
+}
+function cdn(){return `https://ddragon.leagueoflegends.com/cdn/${game.version}`}
+function renderLanguage(){
+ const x=t();document.documentElement.lang=state.lang.replace("_","-");
+ $("appTitle").textContent=x.title;$("subtitle").textContent=x.subtitle;
+ $("settingsTitle").textContent=x.settings;$("backgroundTitle").textContent=x.background;
+ $("uploadLabel").textContent=x.upload;$("brightnessLabel").textContent=x.brightness;$("shadeLabel").textContent=x.shade;
+ $("rerollTitle").textContent=x.rerollTitle;$("selectionNote").textContent=x.selection;
+ $("randomize").textContent=x.randomize;$("reset").textContent=x.reset;$("resultsTitle").textContent=x.results;
+ $("unlockAll").textContent=x.unlockAll;$("dataTitle").textContent=x.data;$("reload").textContent=x.reload;
+ $("rulesTitle").textContent=x.rulesTitle;$("tipsTitle").textContent=x.tipsTitle;$("tips").textContent=x.tips;
+ $("loadingTitle").textContent=x.loading;
+ document.querySelectorAll("[data-t]").forEach(el=>el.textContent=x[el.dataset.t]);
+ $("rules").innerHTML=x.rules.map(rule=>`<li>${esc(rule)}</li>`).join("");
+ $("themeSelect").innerHTML=THEMES.map((th,i)=>`<option value="${th.id}">${esc(x.themes[i])}</option>`).join("");
+ $("themeGrid").innerHTML=THEMES.map((th,i)=>`<button class="theme-btn ${state.theme===th.id?"active":""}" data-theme="${th.id}">${["🌄","🌆","✨","🌑"][i]}<br>${esc(x.themes[i])}</button>`).join("");
+ $("lang").value=state.lang;$("themeSelect").value=state.theme;
+ updateBackdrop();if(game)render();
+}
+async function json(url){const r=await fetch(url);if(!r.ok)throw Error("HTTP "+r.status);return r.json()}
+async function loadData(){
+ const id=++request;showLoading(true);status(t().loading);
+ try{
+  const versions=await json("https://ddragon.leagueoflegends.com/api/versions.json");
+  const version=versions[0],base=`https://ddragon.leagueoflegends.com/cdn/${version}/data/${state.lang}`;
+  const [ch,ru,sp]=await Promise.all([json(base+"/champion.json"),json(base+"/runesReforged.json"),json(base+"/summoner.json")]);
+  if(id!==request)return;
+  const trees=ru,treeMap={},runeMap={};
+  for(const tr of trees){treeMap[String(tr.id)]=tr;for(const slot of tr.slots||[])for(const r of slot.runes||[])runeMap[String(r.id)]=r}
+  const spells=Object.values(sp.data).filter(x=>(x.modes||[]).includes("CLASSIC")).filter(x=>!["SummonerSnowball","SummonerPoroRecall","SummonerOdinGarrison","SummonerSiegeChampSelect1","SummonerSiegeChampSelect2"].includes(x.id));
+  game={version,champions:Object.values(ch.data),trees,treeMap,runeMap,spells};
+  initializeResults();renderLanguage();status(`${t().loaded} · ${version}`,"ok");save();
+ }catch(err){if(id===request){console.error(err);status(`${t().failed} (${err.message})`,"error");toast(t().failed)}}
+ finally{if(id===request)showLoading(false)}
 }
 function reroll(key){
- if(!game){toast(t().noData);return;}
- if(state.locks[key]){toast(t().lockedMsg);return;}
- if(key==="champion") state.results.champion=randomChampion();
+ if(!game){toast(t().noData);return}
+ if(state.locks[key]){toast(t().locked);return}
+ if(key==="champion")state.results.champion=randChampion();
+ if(key==="runes")state.results.runes=randRunes();
+ if(key==="spells")state.results.spells=randSpells();
  if(key==="lane"){
-  const next=randomLane();
-  if(!next){toast(t().incompatible);return;}
+  const next=randLane();
+  if(!next){toast(t().conflict);return}
   state.results.lane=next;
  }
- if(key==="runes") state.results.runes=randomRunePage();
- if(key==="spells") state.results.spells=randomSpells();
- saveState(); renderAll();
+ save();render();
 }
 function randomize(){
- if(!game){toast(t().noData);return;}
- const keys=getSelectedKeys();
- if(!keys.length){toast(t().noSelection);return;}
- // Lane first, then spells, so both selected items remain compatible.
- if(keys.includes("lane")) state.results.lane=randomLane();
- if(keys.includes("champion")) state.results.champion=randomChampion();
- if(keys.includes("runes")) state.results.runes=randomRunePage();
- if(keys.includes("spells")) state.results.spells=randomSpells();
- // A lane-only reroll preserves the spells, so randomLane constrains its choices.
- saveState();renderAll();
+ if(!game){toast(t().noData);return}
+ const keys=["champion","lane","runes","spells"].filter(k=>state.selected[k]&&!state.locks[k]);
+ if(!keys.length){toast(t().noSelection);return}
+ // Preserve locked spell compatibility. If spells can change, lane may be chosen freely.
+ if(keys.includes("lane"))state.results.lane=randLane();
+ if(keys.includes("champion"))state.results.champion=randChampion();
+ if(keys.includes("runes"))state.results.runes=randRunes();
+ if(keys.includes("spells"))state.results.spells=randSpells();
+ save();render();
 }
-function lockButton(key){
- const locked=state.locks[key];
- return `<button class="btn small" data-action="lock" data-key="${key}">${locked?"🔒 "+esc(t().unlock):"🔓 "+esc(t().lock)}</button>`;
-}
-function actionButtons(key){
- return `<div class="card-actions">
- <button class="btn small" data-action="reroll" data-key="${key}">↻ ${esc(t().reroll)}</button>
- ${lockButton(key)}
- </div>`;
-}
-function renderSummary(){
- const c=championById(state.results.champion);
- const laneIndex=LANES.indexOf(state.results.lane);
- const laneName=t().laneNames[laneIndex]||"";
- const r=state.results.runes;
- const p=treeById(r?.primary), s=treeById(r?.secondary);
- const spellIds=state.results.spells||[];
- const spellNames=spellIds.map(id=>spellById(id)?.name||id).join(" + ");
- document.getElementById("summaryGrid").innerHTML=`
- <div class="panel summary">
- ${c?`<img src="${esc(iconUrl(c.image.full))}" alt="">`:"<span class='big-icon'>?</span>"}
- <div><small>${esc(t().champion)}</small><strong>${esc(c?.name||t().noChampion)}</strong></div>
- </div>
- <div class="panel summary"><span class="big-icon">⚔</span><div><small>${esc(t().lane)}</small><strong>${esc(laneName)}</strong></div></div>
- <div class="panel summary"><span class="big-icon">✦</span><div><small>${esc(t().runes)}</small><strong>${esc(p?.name||"—")} / ${esc(s?.name||"—")}</strong></div></div>
- <div class="panel summary"><span class="big-icon">✧</span><div><small>${esc(t().spells)}</small><strong>${esc(spellNames)}</strong></div></div>`;
-}
-function renderChampionCard(){
- const c=championById(state.results.champion);
- return `<article class="card ${state.locks.champion?"locked":""}">
- <div class="card-title">✦ ${esc(t().champion)} ${state.locks.champion?"🔒":""}</div>
- ${c?`<img class="hero-splash" src="https://ddragon.leagueoflegends.com/cdn/${game.version}/img/champion/${esc(c.image.full)}" alt="${esc(c.name)}" loading="lazy">
- <h3>${esc(c.name)}</h3><div class="info-text">${esc(c.title||"")}</div>`:`<p>${esc(t().noChampion)}</p>`}
- ${actionButtons("champion")}
- </article>`;
-}
-function renderLaneCard(){
- const i=LANES.indexOf(state.results.lane);
- const laneName=t().laneNames[i]||"";
- const symbols=["⇧","⚔","◇","⇩","♧"];
- return `<article class="card ${state.locks.lane?"locked":""}">
- <div class="card-title">⌖ ${esc(t().lane)} ${state.locks.lane?"🔒":""}</div>
- <div class="center"><div class="lane-symbol">${symbols[i]||"◇"}</div><h2>${esc(laneName)}</h2>
- <div class="info-text">${state.results.lane==="jungle"?"Smite required":""}</div></div>
- ${actionButtons("lane")}
- </article>`;
-}
-function renderSpellCard(){
- const ids=state.results.spells||[];
- return `<article class="card ${state.locks.spells?"locked":""}">
- <div class="card-title">✧ ${esc(t().spells)} ${state.locks.spells?"🔒":""}</div>
- <div class="spell-row">${ids.map(id=>{
-  const s=spellById(id);
-  return `<div class="spell">${s?`<img src="${esc(iconUrl(s.image.full))}" alt="${esc(s.name)}" loading="lazy"><div>${esc(s.name)}</div><small class="info-text">${esc(s.description||"").replace(/<[^>]*>/g," ").slice(0,70)}</small>`:`<div>?</div>`}</div>`;
- }).join("")}</div>
- ${actionButtons("spells")}
- </article>`;
-}
-function renderRuneTree(treeId, runeIds, label){
- const tree=treeById(treeId);
- if(!tree) return `<div class="rune-tree"><strong>${esc(label)}</strong><p>${esc(t().noRune)}</p></div>`;
- const runes=runeIds.map(runeById).filter(Boolean);
- return `<div class="rune-tree">
- <div class="tree-head"><img src="${esc(runeIconUrl(tree.icon))}" alt=""><strong>${esc(label)}：${esc(tree.name)}</strong></div>
- <div class="rune-list">${runes.map(r=>`<div class="rune-item">
- <img src="${esc(runeIconUrl(r.icon))}" alt="" loading="lazy">
- <div>${esc(r.name)}<small>${esc((r.shortDesc||"").replace(/<[^>]*>/g," ").slice(0,95))}</small></div>
- </div>`).join("")}</div>
- </div>`;
-}
-function renderRuneCard(){
- const r=state.results.runes;
- if(!r){
-  document.getElementById("runeCard").innerHTML=`<div class="card-title">${esc(t().runes)}</div><p>${esc(t().noRune)}</p>`;
-  return;
- }
- const shards=(r.shards||[]).map(id=>{
-  const key=SHARD_KEYS[id]||"statAdaptive";
-  return `<div class="shard-row"><span class="shard-icon">✦</span><div>${esc(t()[key]||key)}</div></div>`;
- }).join("");
- document.getElementById("runeCard").className=`card rune-card ${state.locks.runes?"locked":""}`;
- document.getElementById("runeCard").innerHTML=`
- <div class="card-title">✧ ${esc(t().runes)} ${state.locks.runes?"🔒":""}</div>
- <div class="rune-layout">
- ${renderRuneTree(r.primary,r.primaryRunes||[],t().primary)}
- ${renderRuneTree(r.secondary,r.secondaryRunes||[],t().secondary)}
- <div class="shards"><strong>${esc(t().shards)}</strong>${shards}</div>
- </div>${actionButtons("runes")}`;
-}
-function renderAll(){
- if(!game) return;
- renderSummary();
- document.getElementById("cardsGrid").innerHTML=
-  renderChampionCard()+renderLaneCard()+renderSpellCard();
- renderRuneCard();
- document.getElementById("language").value=state.language;
- document.getElementById("themeSelect").value=state.theme;
- document.querySelectorAll("[data-key]").forEach(el=>{
-  const key=el.dataset.key;
-  if(el.type==="checkbox") el.checked=!!state.selected[key];
- });
- document.querySelectorAll(".theme-btn").forEach(el=>{
-  el.classList.toggle("active",el.dataset.theme===state.theme);
- });
- updateBackdrop();
-}
-function renderStaticLanguage(){
- document.documentElement.lang=state.language.replace("_","-");
- document.querySelectorAll("[data-i18n]").forEach(el=>{
-  const key=el.dataset.i18n;
-  if(t()[key]!==undefined) el.textContent=t()[key];
- });
- const sel=document.getElementById("themeSelect");
- sel.innerHTML=THEMES.map((th,i)=>`<option value="${th.id}">${esc(t().themes[i])}</option>`).join("");
- document.getElementById("themeList").innerHTML=THEMES.map((th,i)=>
-  `<button class="theme-btn ${state.theme===th.id?"active":""}" data-theme="${th.id}">${["🌄","🌆","✨","🌑"][i]}<br>${esc(t().themes[i])}</button>`
- ).join("");
- document.querySelectorAll("[data-key]").forEach(el=>{
-  if(el.type==="checkbox") el.checked=!!state.selected[el.dataset.key];
- });
-}
-async function fetchJson(url){
- const response=await fetch(url,{cache:"no-cache"});
- if(!response.ok) throw new Error(`HTTP ${response.status}: ${url}`);
- return response.json();
-}
-async function loadGameData(){
- const myRequest=++requestId;
- busy=true;showLoading(true,t().loading);
- setStatus(t().loadingStatus+"…");
- try{
-  const versions=await fetchJson("https://ddragon.leagueoflegends.com/api/versions.json");
-  const version=versions[0];
-  if(!version) throw new Error("No Data Dragon version");
-  const lang=state.language;
-  const base=`https://ddragon.leagueoflegends.com/cdn/${version}/data/${lang}`;
-  const [champData,runeData,spellData]=await Promise.all([
-   fetchJson(`${base}/champion.json`),
-   fetchJson(`${base}/runesReforged.json`),
-   fetchJson(`${base}/summoner.json`)
-  ]);
-  if(myRequest!==requestId) return;
-
-  const champions=Object.values(champData.data||{}).map(c=>({
-   id:c.id,name:c.name,title:c.title,image:c.image,roles:c.tags||[]
-  }));
-  const trees=runeData;
-  const treeMap={},runeMap={};
-  for(const tree of trees){
-   treeMap[String(tree.id)]=tree;
-   for(const slot of tree.slots||[]){
-    for(const rune of slot.runes||[]) runeMap[String(rune.id)]=rune;
-   }
-  }
-  const spells=Object.values(spellData.data||{})
-   .filter(s=>(s.modes||[]).includes("CLASSIC"))
-   .filter(s=>!["SummonerSnowball","SummonerPoroRecall","SummonerOdinGarrison","SummonerSiegeChampSelect1","SummonerSiegeChampSelect2"].includes(s.id))
-   .map(s=>({id:s.id,name:s.name,description:s.description,image:s.image}));
-  const spellMap={};
-  for(const s of spells) spellMap[s.id]=s;
-
-  game={version,champions,championMap:champData.data,trees,treeMap,runeMap,spells,spellMap};
-  // Normalize the champion map and spell map to the fields used by renderers.
-  const normalizedChampions={};
-  for(const c of champions) normalizedChampions[c.id]=c;
-  game.championMap=normalizedChampions;
-
-  validSavedResults();
-  // Always enforce the jungle rule on fresh/default results.
-  if(!state.locks.spells){
-   const hasSmite=(state.results.spells||[]).includes("SummonerSmite");
-   if(state.results.lane==="jungle"&&!hasSmite) state.results.spells=randomSpells();
-   if(state.results.lane!=="jungle"&&hasSmite) state.results.spells=randomSpells();
-  }
-  renderStaticLanguage();
-  renderAll();
-  saveState();
-  setStatus(`${t().loaded} · ${t().dataVersion}: ${version}`,"ok");
- }catch(err){
-  if(myRequest!==requestId) return;
-  console.error(err);
-  setStatus(`${t().loadFail} (${err.message})`,"error");
-  toast(t().loadFail);
- }finally{
-  if(myRequest===requestId){busy=false;showLoading(false);}
- }
-}
-
-document.getElementById("language").addEventListener("change",e=>{
- state.language=e.target.value;
- saveState();
- renderStaticLanguage();
- updateBackdrop();
- loadGameData();
+$("lang").addEventListener("change",e=>{state.lang=e.target.value;save();renderLanguage();loadData()});
+$("themeSelect").addEventListener("change",e=>{state.theme=e.target.value;state.custom="";save();renderLanguage()});
+$("themeGrid").addEventListener("click",e=>{const b=e.target.closest("[data-theme]");if(!b)return;state.theme=b.dataset.theme;state.custom="";save();renderLanguage()});
+$("brightness").addEventListener("input",e=>{state.brightness=+e.target.value;updateBackdrop();save()});
+$("shade").addEventListener("input",e=>{state.shade=+e.target.value;updateBackdrop();save()});
+$("file").addEventListener("change",e=>{
+ const f=e.target.files?.[0];if(!f)return;
+ if(!f.type.startsWith("image/")){toast("Please choose an image.");return}
+ if(f.size>1500000){toast("Please choose an image smaller than 1.5 MB.");return}
+ const rd=new FileReader();rd.onload=()=>{state.custom=String(rd.result);save();updateBackdrop();toast(t().upload)};
+ rd.readAsDataURL(f);e.target.value="";
 });
-document.getElementById("themeSelect").addEventListener("change",e=>{
- state.theme=e.target.value;state.customBackground="";
- saveState();renderStaticLanguage();updateBackdrop();
- if(game) renderAll();
-});
-document.getElementById("themeList").addEventListener("click",e=>{
- const btn=e.target.closest("[data-theme]");
- if(!btn) return;
- state.theme=btn.dataset.theme;state.customBackground="";
- saveState();renderStaticLanguage();updateBackdrop();
- if(game) renderAll();
-});
-document.getElementById("brightness").addEventListener("input",e=>{
- state.brightness=Number(e.target.value);updateBackdrop();saveState();
-});
-document.getElementById("shade").addEventListener("input",e=>{
- state.shade=Number(e.target.value);updateBackdrop();saveState();
-});
-document.getElementById("backgroundFile").addEventListener("change",e=>{
- const file=e.target.files?.[0];
- if(!file) return;
- if(!file.type.startsWith("image/")){toast("Please select an image file.");return;}
- if(file.size>2*1024*1024){toast("Please choose an image smaller than 2 MB.");return;}
- const reader=new FileReader();
- reader.onload=()=>{
-  state.customBackground=String(reader.result||"");
-  saveState();updateBackdrop();toast(t().custom);
- };
- reader.onerror=()=>toast("Could not read image.");
- reader.readAsDataURL(file);
- e.target.value="";
-});
-document.querySelectorAll('input[type="checkbox"][data-key]').forEach(el=>{
- el.addEventListener("change",()=>{
-  state.selected[el.dataset.key]=el.checked;saveState();
- });
-});
-document.getElementById("randomize").addEventListener("click",randomize);
-document.getElementById("reloadData").addEventListener("click",loadGameData);
-document.getElementById("unlockAll").addEventListener("click",()=>{
- for(const k of Object.keys(state.locks)) state.locks[k]=false;
- saveState();if(game)renderAll();
-});
-document.getElementById("reset").addEventListener("click",()=>{
- for(const k of Object.keys(state.locks)) state.locks[k]=false;
- state.results={champion:randomChampion(),lane:pick(LANES),runes:randomRunePage(),spells:null};
- state.results.spells=randomSpells();
- saveState();renderAll();
+document.querySelectorAll("[data-key]").forEach(el=>el.addEventListener("change",()=>{
+ state.selected[el.dataset.key]=el.checked;save()
+}));
+$("randomize").addEventListener("click",randomize);
+$("reload").addEventListener("click",loadData);
+$("unlockAll").addEventListener("click",()=>{Object.keys(state.locks).forEach(k=>state.locks[k]=false);save();render()});
+$("reset").addEventListener("click",()=>{
+ if(!game)return;
+ Object.keys(state.locks).forEach(k=>state.locks[k]=false);
+ state.results={champion:randChampion(),lane:pick(LANES),runes:randRunes(),spells:null};
+ state.results.spells=randSpells();save();render();
 });
 document.body.addEventListener("click",e=>{
- const btn=e.target.closest("button[data-action]");
- if(!btn) return;
- const key=btn.dataset.key;
- if(btn.dataset.action==="lock"){
-  state.locks[key]=!state.locks[key];saveState();renderAll();
- }
- if(btn.dataset.action==="reroll") reroll(key);
+ const b=e.target.closest("[data-act]");if(!b)return;
+ const key=b.dataset.key;
+ if(b.dataset.act==="lock"){state.locks[key]=!state.locks[key];save();render()}
+ if(b.dataset.act==="reroll")reroll(key);
 });
-
-renderStaticLanguage();
-updateBackdrop();
-loadGameData();
+renderLanguage();loadData();
 </script>
 </body>
 </html>
