@@ -39,6 +39,10 @@ h3{margin-bottom:5px}
 .theme{height:68px;background-size:cover;background-position:center;position:relative;overflow:hidden;text-align:left;font-size:11px}
 .theme span{position:absolute;bottom:5px;left:6px;text-shadow:0 1px 4px black}
 .theme.active{outline:2px solid var(--gold)}
+.file-picker{display:flex;flex-direction:column;gap:8px;min-width:0}
+#upload{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.file-button{display:inline-block;align-self:flex-start;border:1px solid #ffffff2a;background:#171f30;border-radius:6px;padding:9px 12px;cursor:pointer;font-size:13px}
+.file-name{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 input[type=range]{width:100%;accent-color:var(--gold)}
 .range-label{display:flex;justify-content:space-between;font-size:12px;margin-top:14px}
 .check{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #ffffff12;font-size:13px}
@@ -90,7 +94,7 @@ a{color:var(--gold)}
   <header>
     <div class="brand">
       <small>SUMMONER'S RIFT</small>
-      <span>⚔ LoL 隨機挑戰產生器</span>
+      <span id="brandTitle">⚔ LoL 隨機挑戰產生器</span>
     </div>
     <div class="top-actions">
       <span id="patch" class="muted">PATCH —</span>
@@ -109,8 +113,12 @@ a{color:var(--gold)}
       <h2 id="settingsTitle">設定</h2>
       <label class="field" id="themeLabel">背景主題</label>
       <div class="theme-grid" id="themes"></div>
-      <label class="field" id="uploadLabel" for="upload">自訂背景圖片</label>
-      <input id="upload" type="file" accept="image/*" style="width:100%">
+      <label class="field" id="uploadLabel">自訂背景圖片</label>
+      <div class="file-picker">
+        <input id="upload" type="file" accept="image/*">
+        <label class="file-button" id="uploadButton" for="upload">選擇檔案</label>
+        <span id="fileName" class="file-name">未選擇任何檔案</span>
+      </div>
       <p class="hint" id="uploadHint">圖片只會保存在此瀏覽器，最大 2 MB。</p>
       <button id="clearBg" style="display:none">移除自訂背景</button>
 
@@ -141,7 +149,7 @@ a{color:var(--gold)}
       </div>
       <section class="grid" id="results"></section>
       <footer>
-        <span id="footerText">遊戲資料來自 Riot Data Dragon。</span><br>
+        <span id="footerText">英雄、符文與召喚師技能資料來自 Riot Data Dragon。</span><br>
         <a href="https://developer.riotgames.com/docs/lol" target="_blank" rel="noreferrer">Riot Developer Portal</a>
         · <a href="https://ddragon.leagueoflegends.com/api/versions.json" target="_blank" rel="noreferrer">Data Dragon Versions</a>
       </footer>
@@ -161,7 +169,7 @@ const LOCALES = {
 
 const TEXT = {
  "zh-TW":{
-  settings:"設定",theme:"背景主題",custom:"自訂背景圖片",uploadHint:"圖片只儲存於此瀏覽器，最大 2 MB。",
+  settings:"設定",theme:"背景主題",custom:"自訂背景圖片",uploadButton:"選擇檔案",noFile:"未選擇任何檔案",uploadHint:"圖片只儲存於此瀏覽器，最大 2 MB。",
   clear:"移除自訂背景",brightness:"亮度",overlay:"遮罩深度",select:"抽選項目",
   hint:"只重新抽選勾選且未鎖定的項目。",title:"LoL 隨機挑戰產生器",
   subtitle:"把下一場交給命運。",generate:"開始隨機",loading:"正在載入 Riot 遊戲資料…",
@@ -178,7 +186,7 @@ const TEXT = {
   runeError:"目前版本的符文資料不足，無法建立合法配置。"
  },
  "zh-CN":{
-  settings:"设置",theme:"背景主题",custom:"自定义背景图片",uploadHint:"图片仅保存在此浏览器，最大 2 MB。",
+  settings:"设置",theme:"背景主题",custom:"自定义背景图片",uploadButton:"选择文件",noFile:"未选择任何文件",uploadHint:"图片仅保存在此浏览器，最大 2 MB。",
   clear:"移除自定义背景",brightness:"亮度",overlay:"遮罩深度",select:"抽选项目",
   hint:"只重新抽选勾选且未锁定的项目。",title:"LoL 随机挑战生成器",
   subtitle:"把下一场交给命运。",generate:"开始随机",loading:"正在加载 Riot 游戏数据…",
@@ -195,7 +203,7 @@ const TEXT = {
   runeError:"当前版本的符文数据不足，无法创建合法配置。"
  },
  "en-US":{
-  settings:"Settings",theme:"Background themes",custom:"Custom background",uploadHint:"Saved in this browser only. Max 2 MB.",
+  settings:"Settings",theme:"Background themes",custom:"Custom background",uploadButton:"Choose file",noFile:"No file selected",uploadHint:"Saved in this browser only. Max 2 MB.",
   clear:"Remove custom background",brightness:"Brightness",overlay:"Overlay strength",select:"Randomize items",
   hint:"Only checked and unlocked items are rerolled.",title:"LoL Random Challenge",
   subtitle:"Leave your next game to fate.",generate:"Randomize",loading:"Loading Riot game data…",
@@ -212,7 +220,7 @@ const TEXT = {
   runeError:"Not enough rune data to build a valid page."
  },
  "ja-JP":{
-  settings:"設定",theme:"背景テーマ",custom:"カスタム背景",uploadHint:"画像はこのブラウザーに保存。最大 2 MB。",
+  settings:"設定",theme:"背景テーマ",custom:"カスタム背景",uploadButton:"ファイルを選択",noFile:"ファイルが選択されていません",uploadHint:"画像はこのブラウザーに保存。最大 2 MB。",
   clear:"カスタム背景を削除",brightness:"明るさ",overlay:"オーバーレイ",select:"抽選項目",
   hint:"チェック済みかつロックされていない項目のみ再抽選します。",title:"LoL ランダムチャレンジ",
   subtitle:"次の試合を運命に任せよう。",generate:"ランダム生成",loading:"Riot データを読み込み中…",
@@ -229,7 +237,7 @@ const TEXT = {
   runeError:"有効なルーンページを作成するデータが不足しています。"
  },
  "ko-KR":{
-  settings:"설정",theme:"배경 테마",custom:"사용자 지정 배경",uploadHint:"이 브라우저에만 저장됩니다. 최대 2 MB.",
+  settings:"설정",theme:"배경 테마",custom:"사용자 지정 배경",uploadButton:"파일 선택",noFile:"선택된 파일 없음",uploadHint:"이 브라우저에만 저장됩니다. 최대 2 MB.",
   clear:"사용자 배경 제거",brightness:"밝기",overlay:"오버레이",select:"추첨 항목",
   hint:"체크되어 있고 잠기지 않은 항목만 다시 추첨합니다.",title:"LoL 랜덤 챌린지",
   subtitle:"다음 게임을 운명에 맡겨 보세요.",generate:"랜덤 추첨",loading:"Riot 게임 데이터 로딩 중…",
@@ -332,8 +340,7 @@ function shuffle(arr){
  return a;
 }
 
-/* 符文配置：主系 4 個、副系 2 個，加上 3 個屬性碎片。
-   Data Dragon 的 runesReforged 不包含屬性碎片，因此使用 Riot 資產名稱。 */
+/* 屬性碎片：三列依序抽選。 */
 const STAT_SHARDS = [
  {row:1, options:[
   {id:"adaptive",name:{"zh-TW":"適性之力","zh-CN":"适应之力","en-US":"Adaptive Force","ja-JP":"アダプティブフォース","ko-KR":"적응형 능력치"},icon:"perk-images/StatMods/StatModsAdaptiveForceIcon.png"},
@@ -342,18 +349,19 @@ const STAT_SHARDS = [
  {row:2, options:[
   {id:"adaptive",name:{"zh-TW":"適性之力","zh-CN":"适应之力","en-US":"Adaptive Force","ja-JP":"アダプティブフォース","ko-KR":"적응형 능력치"},icon:"perk-images/StatMods/StatModsAdaptiveForceIcon.png"},
   {id:"ms",name:{"zh-TW":"移動速度","zh-CN":"移动速度","en-US":"Movement Speed","ja-JP":"移動速度","ko-KR":"이동 속도"},icon:"perk-images/StatMods/StatModsMovementSpeedIcon.png"},
-  {id:"health",name:{"zh-TW":"生命值","zh-CN":"生命值","en-US":"Health Scaling","ja-JP":"体力","ko-KR":"체력"},icon:"perk-images/StatMods/StatModsHealthScalingIcon.png"}]},
+  {id:"health-scaling",name:{"zh-TW":"生命係數","zh-CN":"生命系数","en-US":"Health Scaling","ja-JP":"体力スケーリング","ko-KR":"체력 비례"},icon:"perk-images/StatMods/StatModsHealthScalingIcon.png"}]},
  {row:3, options:[
-  {id:"health",name:{"zh-TW":"生命值","zh-CN":"生命值","en-US":"Health Scaling","ja-JP":"体力","ko-KR":"체력"},icon:"perk-images/StatMods/StatModsHealthScalingIcon.png"},
-  {id:"armor",name:{"zh-TW":"護甲","zh-CN":"护甲","en-US":"Armor","ja-JP":"物理防御","ko-KR":"방어력"},icon:"perk-images/StatMods/StatModsArmorIcon.png"},
-  {id:"mr",name:{"zh-TW":"魔法抗性","zh-CN":"魔法抗性","en-US":"Magic Resist","ja-JP":"魔法防御","ko-KR":"마법 저항력"},icon:"perk-images/StatMods/StatModsMagicResIcon.png"}]}
+  {id:"tenacity-slow-resist",name:{"zh-TW":"韌性與緩速抗性","zh-CN":"韧性与减速抗性","en-US":"Tenacity and Slow Resist","ja-JP":"強靭性とスロウ耐性","ko-KR":"강인함 및 둔화 저항"},icon:"perk-images/StatMods/StatModsTenacityIcon.png"},
+  {id:"health-scaling",name:{"zh-TW":"生命係數","zh-CN":"生命系数","en-US":"Health Scaling","ja-JP":"体力スケーリング","ko-KR":"체력 비례"},icon:"perk-images/StatMods/StatModsHealthScalingIcon.png"},
+  {id:"health",name:{"zh-TW":"生命值","zh-CN":"生命值","en-US":"Health","ja-JP":"体力","ko-KR":"체력"},icon:"perk-images/StatMods/StatModsHealthPlusIcon.png"}]}
 ];
 
 function makeRunePage(trees){
  if(!Array.isArray(trees))return null;
  const valid=trees.filter(tree=>Array.isArray(tree.slots)&&tree.slots.filter(slot=>slot.runes?.length).length>=4);
  if(valid.length<2)return null;
- const primary=pick(valid), secondary=pick(valid.filter(x=>x.id!==primary.id));
+ const primary=pick(valid);
+ const secondary=pick(valid.filter(x=>x.id!==primary.id));
  if(!primary||!secondary)return null;
  const primaryRows=primary.slots.filter(s=>s.runes?.length).slice(0,4);
  const secondaryRows=secondary.slots.filter(s=>s.runes?.length).slice(1,4);
@@ -362,7 +370,11 @@ function makeRunePage(trees){
  const sRunes=shuffle(secondaryRows).slice(0,2).map(row=>pick(row.runes));
  const shards=STAT_SHARDS.map(row=>{
   const x=pick(row.options);
-  return {id:x.id,name:x.name[state.lang]||x.name["en-US"],icon:`${API}/cdn/img/${x.icon}`};
+  return {
+   row:row.row,id:x.id,
+   name:x.name[state.lang]||x.name["en-US"],
+   icon:`${API}/cdn/img/${x.icon}`
+  };
  });
  if([...pRunes,...sRunes].some(x=>!x)||shards.some(x=>!x))return null;
  return {
@@ -393,8 +405,10 @@ function isJungle(lane){return laneId(lane)==="jungle";}
 function hasSmite(pair){return Array.isArray(pair)&&pair.some(x=>x.id==="SummonerSmite");}
 
 function lanePoolForLockedSpells(){
- if(!state.locked.spells||!state.results.spells)return ["top","jungle","mid","bottom","support"];
- return hasSmite(state.results.spells)?["jungle"]:["top","mid","bottom","support"];
+ if(!state.locked.spells||!state.results.spells)
+  return ["top","jungle","mid","bottom","support"];
+ return hasSmite(state.results.spells)
+  ?["jungle"]:["top","mid","bottom","support"];
 }
 
 function spellPair(spells,lane){
@@ -419,7 +433,7 @@ function spellPairWithoutSmite(spells){
 function reroll(key){
  if(!game||busy||state.locked[key])return;
  let result=null;
- if(key==="champion") result=pick(game.champions);
+ if(key==="champion")result=pick(game.champions);
  if(key==="lane"){
   const pool=lanePoolForLockedSpells();
   result=makeLane(pick(pool));
@@ -427,9 +441,12 @@ function reroll(key){
    const nextSpells=spellPair(game.spells,result);
    if(nextSpells)state.results={...state.results,spells:nextSpells};
   }
- } else if(key==="runes") result=makeRunePage(game.runes);
- else if(key==="spells") result=spellPair(game.spells,state.results.lane);
- if(!result){showError(key==="runes"?t().runeError:t().dataMissing);return;}
+ }else if(key==="runes")result=makeRunePage(game.runes);
+ else if(key==="spells")result=spellPair(game.spells,state.results.lane);
+ if(!result){
+  showError(key==="runes"?t().runeError:t().dataMissing);
+  return;
+ }
  state.results={...state.results,[key]:result};
  save();renderResults();showError("");
 }
@@ -439,16 +456,17 @@ function randomize(){
  const chosen=keys.filter(k=>state.selected[k]&&!state.locked[k]);
  if(!chosen.length){showError(t().noItems);return;}
 
- // 先決定路線，確保召喚師技能符合規則。
  if(chosen.includes("lane")){
   const pool=lanePoolForLockedSpells();
   state.results={...state.results,lane:makeLane(pick(pool))};
  }
- if(chosen.includes("champion"))state.results={...state.results,champion:pick(game.champions)};
- if(chosen.includes("runes"))state.results={...state.results,runes:makeRunePage(game.runes)};
- if(chosen.includes("spells"))state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
+ if(chosen.includes("champion"))
+  state.results={...state.results,champion:pick(game.champions)};
+ if(chosen.includes("runes"))
+  state.results={...state.results,runes:makeRunePage(game.runes)};
+ if(chosen.includes("spells"))
+  state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
 
- // 若路線重抽而技能未鎖定，重新抽技能以配合路線。
  if(chosen.includes("lane")&&!chosen.includes("spells")&&!state.locked.spells){
   state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
  }
@@ -529,10 +547,19 @@ function renderResults(){
       <div class="rune">${img(rune.icon,rune.name)}<span>${escapeHtml(rune.name)}</span></div>
      `).join("")}
     </div>`;
+
    body=`<div class="runes">
     ${treeHtml(r.primary,t().primary)}
     ${treeHtml(r.secondary,t().secondary)}
-   </div>${r.shards?`<div style="margin-top:14px;border-top:1px solid #ffffff18;padding-top:10px"><div class="tree-title"><b>${escapeHtml(t().shards||"Stat shards")}</b></div><div style="display:flex;gap:10px;flex-wrap:wrap">${r.shards.map(sh=>`<div class="rune">${img(sh.icon,sh.name)}<span>${escapeHtml(sh.name)}</span></div>`).join("")}</div></div>`:""}`;
+   </div>${r.shards?`
+    <div style="margin-top:14px;border-top:1px solid #ffffff18;padding-top:10px">
+     <div class="tree-title"><b>${escapeHtml(t().shards||"Stat shards")}</b></div>
+     <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${r.shards.map(sh=>`
+       <div class="rune">${img(sh.icon,sh.name)}<span>${escapeHtml(sh.name)}</span></div>
+      `).join("")}
+     </div>
+    </div>`:""}`;
   }
 
   return `<article class="card ${locked?"locked":""}">
@@ -549,6 +576,7 @@ function renderResults(){
  $("results").querySelectorAll("[data-reroll]").forEach(button=>{
   button.addEventListener("click",()=>reroll(button.dataset.reroll));
  });
+
  $("results").querySelectorAll("[data-lock]").forEach(button=>{
   button.addEventListener("click",()=>{
    const key=button.dataset.lock;
@@ -556,12 +584,67 @@ function renderResults(){
    save();renderResults();updateLockCount();renderChecks();
   });
  });
+
  updateLockCount();
 }
 
 function updateLockCount(){
  const count=keys.filter(k=>state.locked[k]).length;
  $("lockCount").textContent=`${count}/4 ${t().locked}`;
+}
+
+/* 切換語言時，依照 ID 更新既有結果，而不是重新抽選。 */
+function localizeExistingResults(){
+ if(!game)return;
+
+ const byId=(items,id)=>items.find(x=>String(x.id)===String(id));
+
+ if(state.results.champion){
+  const fresh=byId(game.champions,state.results.champion.id);
+  if(fresh)state.results.champion=fresh;
+ }
+
+ if(state.results.lane){
+  state.results.lane=makeLane(laneId(state.results.lane));
+ }
+
+ if(Array.isArray(state.results.spells)){
+  state.results.spells=state.results.spells.map(old=>byId(game.spells,old.id)||old);
+ }
+
+ if(state.results.runes){
+  const localizeTree=old=>{
+   const fresh=byId(game.runes,old.id);
+   if(!fresh)return old;
+   return {
+    ...fresh,
+    runes:(old.runes||[]).map(oldRune=>{
+     for(const slot of fresh.slots){
+      const found=slot.runes.find(x=>String(x.id)===String(oldRune.id));
+      if(found)return found;
+     }
+     return oldRune;
+    })
+   };
+  };
+
+  const old=state.results.runes;
+  state.results.runes={
+   ...old,
+   primary:localizeTree(old.primary),
+   secondary:localizeTree(old.secondary),
+   shards:(old.shards||[]).map((sh,index)=>{
+    const row=STAT_SHARDS.find(x=>x.row===(sh.row||index+1));
+    const fresh=row?.options.find(x=>x.id===sh.id);
+    return fresh?{
+     ...sh,
+     row:row.row,
+     name:fresh.name[state.lang]||fresh.name["en-US"],
+     icon:`${API}/cdn/img/${fresh.icon}`
+    }:sh;
+   })
+  };
+ }
 }
 
 function renderLanguage(){
@@ -571,6 +654,12 @@ function renderLanguage(){
  $("settingsTitle").textContent=x.settings;
  $("themeLabel").textContent=x.theme;
  $("uploadLabel").textContent=x.custom;
+ $("uploadButton").textContent=x.uploadButton;
+
+ if(!$("upload").files?.length){
+  $("fileName").textContent=x.noFile;
+ }
+
  $("uploadHint").textContent=x.uploadHint;
  $("clearBg").textContent=x.clear;
  $("brightnessLabel").textContent=x.brightness;
@@ -578,22 +667,30 @@ function renderLanguage(){
  $("selectLabel").textContent=x.select;
  $("randomHint").textContent=x.hint;
  $("title").textContent=x.title;
+ $("brandTitle").textContent="⚔ "+x.title;
  $("subtitle").textContent=x.subtitle;
  $("generate").textContent="✦ "+x.generate+" ✦";
  $("boardTitle").textContent=x.board;
  $("footerText").textContent=x.footer;
  $("status").textContent=busy?x.loading:(game?`${x.loaded} · ${game.version}`:"");
- renderThemes();renderChecks();renderResults();updateBackdrop();
+
+ renderThemes();
+ renderChecks();
+ renderResults();
+ updateBackdrop();
 }
 
 async function loadGameData(){
  const thisRequest=++requestNumber;
- busy=true;showError("");renderLanguage();
+ busy=true;
+ showError("");
+ renderLanguage();
  $("generate").disabled=true;
 
  try{
   const versions=await fetchJson(`${API}/api/versions.json`);
   if(thisRequest!==requestNumber)return;
+
   const version=versions[0];
   if(!version)throw new Error(t().dataMissing);
 
@@ -609,16 +706,21 @@ async function loadGameData(){
   if(thisRequest!==requestNumber)return;
 
   const champions=Object.values(championData.data||{}).map(c=>({
-   id:c.id,name:c.name,title:c.title,
+   id:c.id,
+   name:c.name,
+   title:c.title,
    image:`${API}/cdn/${version}/img/champion/${c.image.full}`
   })).sort((a,b)=>a.name.localeCompare(b.name));
 
   const runes=(runeData||[]).map(tree=>({
-   id:tree.id,name:tree.name,
+   id:tree.id,
+   name:tree.name,
    icon:`${API}/cdn/img/${tree.icon}`,
    slots:(tree.slots||[]).map(slot=>({
     runes:(slot.runes||[]).map(r=>({
-     id:r.id,name:r.name,icon:`${API}/cdn/img/${r.icon}`
+     id:r.id,
+     name:r.name,
+     icon:`${API}/cdn/img/${r.icon}`
     }))
    }))
   }));
@@ -626,11 +728,15 @@ async function loadGameData(){
   const spells=Object.values(spellData.data||{})
    .filter(s=>s.modes?.includes("CLASSIC"))
    .filter(s=>![
-    "SummonerSnowball","SummonerPoroRecall",
-    "SummonerSiegeChampSelect1","SummonerSiegeChampSelect2"
+    "SummonerSnowball",
+    "SummonerPoroRecall",
+    "SummonerSiegeChampSelect1",
+    "SummonerSiegeChampSelect2"
    ].includes(s.id))
    .map(s=>({
-    id:s.id,name:s.name,description:s.description,
+    id:s.id,
+    name:s.name,
+    description:s.description,
     image:`${API}/cdn/${version}/img/spell/${s.image.full}`
    }));
 
@@ -641,14 +747,28 @@ async function loadGameData(){
   game={version,champions,runes,spells};
   $("patch").textContent="PATCH "+version;
 
-  // 語言或資料版本變更時，保留現有抽選結果。
+  // 更新既有結果的翻譯，不改變已抽選的 ID。
+  localizeExistingResults();
+
   for(const key of keys){
    if(state.results[key])continue;
+
    const result=key==="champion"?pick(champions):
     key==="lane"?makeLane(pick(["top","jungle","mid","bottom","support"])):
     key==="runes"?makeRunePage(runes):
     spellPair(spells,state.results.lane);
+
    if(result)state.results[key]=result;
+  }
+
+  // 確保打野帶重擊，其他路線不帶重擊。
+  if(state.results.lane&&state.results.spells){
+   if(isJungle(state.results.lane)&&!hasSmite(state.results.spells)){
+    state.results.spells=spellPair(spells,state.results.lane);
+   }
+   if(!isJungle(state.results.lane)&&hasSmite(state.results.spells)){
+    state.results.spells=spellPair(spells,state.results.lane);
+   }
   }
 
   save();
@@ -675,7 +795,7 @@ async function fetchJson(url){
 $("language").addEventListener("change",e=>{
  state.lang=e.target.value;
  save();
- // 重新載入對應語言的資料，但保留目前抽選結果。
+ // 重新載入對應語言資料，保留既有抽選結果。
  loadGameData();
 });
 
@@ -683,28 +803,46 @@ $("generate").addEventListener("click",randomize);
 
 $("brightness").addEventListener("input",e=>{
  state.brightness=Number(e.target.value);
- updateBackdrop();save();
+ updateBackdrop();
+ save();
 });
 
 $("overlay").addEventListener("input",e=>{
  state.overlay=Number(e.target.value);
- updateBackdrop();save();
+ updateBackdrop();
+ save();
 });
 
 $("upload").addEventListener("change",e=>{
  const file=e.target.files?.[0];
- if(!file)return;
+
+ if(!file){
+  $("fileName").textContent=t().noFile;
+  return;
+ }
+
+ $("fileName").textContent=file.name;
+
  if(!file.type.startsWith("image/")){
-  showError(t().uploadError);return;
+  showError(t().uploadError);
+  return;
  }
+
  if(file.size>2*1024*1024){
-  showError(t().sizeError);return;
+  showError(t().sizeError);
+  return;
  }
+
  const reader=new FileReader();
+
  reader.onload=()=>{
   state.customBg=reader.result;
-  save();updateBackdrop();renderThemes();showError("");
+  save();
+  updateBackdrop();
+  renderThemes();
+  showError("");
  };
+
  reader.onerror=()=>showError(t().fileError);
  reader.readAsDataURL(file);
 });
@@ -712,7 +850,10 @@ $("upload").addEventListener("change",e=>{
 $("clearBg").addEventListener("click",()=>{
  state.customBg="";
  $("upload").value="";
- save();updateBackdrop();renderThemes();
+ $("fileName").textContent=t().noFile;
+ save();
+ updateBackdrop();
+ renderThemes();
 });
 
 function start(){
