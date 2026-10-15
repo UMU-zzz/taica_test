@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101522">
-<title>LoL 隨機挑戰產生器 V2.0</title>
+<title>LoL 隨機挑戰產生器</title>
 <style>
 :root {
   --gold:#dfc47e; --panel:rgba(13,19,32,.94);
@@ -62,7 +62,8 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .champion img{width:84px;height:84px;object-fit:cover;border:1px solid var(--gold);border-radius:6px}
 .champion p{font-size:12px;color:var(--muted);margin-bottom:0}
 .lane{display:flex;align-items:center;gap:16px;min-height:90px}
-.lane-icon{font-size:43px;color:var(--gold);width:84px;text-align:center}
+.lane-icon{width:84px;height:84px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lane-icon img{width:68px;height:68px;object-fit:contain;filter:brightness(0) saturate(100%) invert(85%) sepia(29%) saturate(473%) hue-rotate(2deg) brightness(101%) contrast(91%)}
 .spells{display:grid;gap:12px}
 .spell{display:flex;align-items:center;gap:10px}
 .spell img{width:42px;height:42px;border-radius:5px}
@@ -89,7 +90,7 @@ a{color:var(--gold)}
   <header>
     <div class="brand">
       <small>SUMMONER'S RIFT</small>
-      <span>⚔ LOL RANDOM CHALLENGE V2.0</span>
+      <span>⚔ LoL 隨機挑戰產生器</span>
     </div>
     <div class="top-actions">
       <span id="patch" class="muted">PATCH —</span>
@@ -100,7 +101,6 @@ a{color:var(--gold)}
         <option value="ja-JP">日本語</option>
         <option value="ko-KR">한국어</option>
       </select>
-      <button id="toggleSettings">☷ 設定</button>
     </div>
   </header>
 
@@ -332,9 +332,8 @@ function shuffle(arr){
  return a;
 }
 
-/* Rune page: 4 primary runes, 2 secondary runes from different rows,
-   plus the three standard stat-shard rows. Data Dragon does not include
-   stat shards in runesReforged, so use Riot's documented asset names. */
+/* 符文配置：主系 4 個、副系 2 個，加上 3 個屬性碎片。
+   Data Dragon 的 runesReforged 不包含屬性碎片，因此使用 Riot 資產名稱。 */
 const STAT_SHARDS = [
  {row:1, options:[
   {id:"adaptive",name:{"zh-TW":"適性之力","zh-CN":"适应之力","en-US":"Adaptive Force","ja-JP":"アダプティブフォース","ko-KR":"적응형 능력치"},icon:"perk-images/StatMods/StatModsAdaptiveForceIcon.png"},
@@ -361,9 +360,16 @@ function makeRunePage(trees){
  if(primaryRows.length!==4||secondaryRows.length<2)return null;
  const pRunes=primaryRows.map(row=>pick(row.runes));
  const sRunes=shuffle(secondaryRows).slice(0,2).map(row=>pick(row.runes));
- const shards=STAT_SHARDS.map(row=>{const x=pick(row.options);return {id:x.id,name:x.name[state.lang]||x.name["en-US"],icon:`${API}/cdn/img/${x.icon}`};});
+ const shards=STAT_SHARDS.map(row=>{
+  const x=pick(row.options);
+  return {id:x.id,name:x.name[state.lang]||x.name["en-US"],icon:`${API}/cdn/img/${x.icon}`};
+ });
  if([...pRunes,...sRunes].some(x=>!x)||shards.some(x=>!x))return null;
- return {primary:{id:primary.id,name:primary.name,icon:primary.icon,runes:pRunes},secondary:{id:secondary.id,name:secondary.name,icon:secondary.icon,runes:sRunes},shards};
+ return {
+  primary:{id:primary.id,name:primary.name,icon:primary.icon,runes:pRunes},
+  secondary:{id:secondary.id,name:secondary.name,icon:secondary.icon,runes:sRunes},
+  shards
+ };
 }
 
 function laneId(lane){
@@ -377,12 +383,15 @@ function laneId(lane){
  }
  return "mid";
 }
+
 function makeLane(id){
  const i={top:0,jungle:1,mid:2,bottom:3,support:4}[id]??2;
  return {id,name:t().lanes[i]};
 }
+
 function isJungle(lane){return laneId(lane)==="jungle";}
 function hasSmite(pair){return Array.isArray(pair)&&pair.some(x=>x.id==="SummonerSmite");}
+
 function lanePoolForLockedSpells(){
  if(!state.locked.spells||!state.results.spells)return ["top","jungle","mid","bottom","support"];
  return hasSmite(state.results.spells)?["jungle"]:["top","mid","bottom","support"];
@@ -399,6 +408,7 @@ function spellPair(spells,lane){
  }
  return spellPairWithoutSmite(other);
 }
+
 function spellPairWithoutSmite(spells){
  if(!Array.isArray(spells)||spells.length<2)return null;
  const first=pick(spells);
@@ -429,21 +439,19 @@ function randomize(){
  const chosen=keys.filter(k=>state.selected[k]&&!state.locked[k]);
  if(!chosen.length){showError(t().noItems);return;}
 
- // Choose the lane first so spell constraints are always respected.
+ // 先決定路線，確保召喚師技能符合規則。
  if(chosen.includes("lane")){
   const pool=lanePoolForLockedSpells();
   state.results={...state.results,lane:makeLane(pick(pool))};
  }
-
  if(chosen.includes("champion"))state.results={...state.results,champion:pick(game.champions)};
  if(chosen.includes("runes"))state.results={...state.results,runes:makeRunePage(game.runes)};
  if(chosen.includes("spells"))state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
 
- // If the lane was rerolled and spells are unlocked, refresh spells to match it.
+ // 若路線重抽而技能未鎖定，重新抽技能以配合路線。
  if(chosen.includes("lane")&&!chosen.includes("spells")&&!state.locked.spells){
   state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
  }
-
  if(chosen.some(k=>!state.results[k])){showError(t().dataMissing);return;}
  save();renderResults();showError("");
 }
@@ -480,6 +488,18 @@ function renderChecks(){
  });
 }
 
+function laneIcon(lane){
+ const id=laneId(lane);
+ const icons={
+  top:"position-top.svg",
+  jungle:"position-jungle.svg",
+  mid:"position-middle.svg",
+  bottom:"position-bottom.svg",
+  support:"position-utility.svg"
+ };
+ return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/svg/${icons[id]||icons.mid}`;
+}
+
 function renderResults(){
  $("results").innerHTML=keys.map((key,index)=>{
   const r=state.results[key];
@@ -493,7 +513,7 @@ function renderResults(){
    </div>`;
   }else if(r&&key==="lane"){
    body=`<div class="lane">
-    <div class="lane-icon">⌖</div>
+    <div class="lane-icon">${img(laneIcon(r),r.name)}</div>
     <div><h3>${escapeHtml(r.name)}</h3><p class="muted">${escapeHtml(t().roleNote)}</p></div>
    </div>`;
   }else if(r&&key==="spells"){
@@ -509,19 +529,10 @@ function renderResults(){
       <div class="rune">${img(rune.icon,rune.name)}<span>${escapeHtml(rune.name)}</span></div>
      `).join("")}
     </div>`;
-
    body=`<div class="runes">
     ${treeHtml(r.primary,t().primary)}
     ${treeHtml(r.secondary,t().secondary)}
-   </div>${r.shards?`
-    <div style="margin-top:14px;border-top:1px solid #ffffff18;padding-top:10px">
-     <div class="tree-title"><b>${escapeHtml(t().shards||"Stat shards")}</b></div>
-     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      ${r.shards.map(sh=>`
-       <div class="rune">${img(sh.icon,sh.name)}<span>${escapeHtml(sh.name)}</span></div>
-      `).join("")}
-     </div>
-    </div>`:""}`;
+   </div>${r.shards?`<div style="margin-top:14px;border-top:1px solid #ffffff18;padding-top:10px"><div class="tree-title"><b>${escapeHtml(t().shards||"Stat shards")}</b></div><div style="display:flex;gap:10px;flex-wrap:wrap">${r.shards.map(sh=>`<div class="rune">${img(sh.icon,sh.name)}<span>${escapeHtml(sh.name)}</span></div>`).join("")}</div></div>`:""}`;
   }
 
   return `<article class="card ${locked?"locked":""}">
@@ -538,7 +549,6 @@ function renderResults(){
  $("results").querySelectorAll("[data-reroll]").forEach(button=>{
   button.addEventListener("click",()=>reroll(button.dataset.reroll));
  });
-
  $("results").querySelectorAll("[data-lock]").forEach(button=>{
   button.addEventListener("click",()=>{
    const key=button.dataset.lock;
@@ -546,7 +556,6 @@ function renderResults(){
    save();renderResults();updateLockCount();renderChecks();
   });
  });
-
  updateLockCount();
 }
 
@@ -573,7 +582,6 @@ function renderLanguage(){
  $("generate").textContent="✦ "+x.generate+" ✦";
  $("boardTitle").textContent=x.board;
  $("footerText").textContent=x.footer;
- $("toggleSettings").textContent="☷ "+x.settings;
  $("status").textContent=busy?x.loading:(game?`${x.loaded} · ${game.version}`:"");
  renderThemes();renderChecks();renderResults();updateBackdrop();
 }
@@ -633,8 +641,7 @@ async function loadGameData(){
   game={version,champions,runes,spells};
   $("patch").textContent="PATCH "+version;
 
-  // Keep existing results when the language or data version changes.
-  // Existing results are not overwritten merely by loading new data.
+  // 語言或資料版本變更時，保留現有抽選結果。
   for(const key of keys){
    if(state.results[key])continue;
    const result=key==="champion"?pick(champions):
@@ -642,11 +649,6 @@ async function loadGameData(){
     key==="runes"?makeRunePage(runes):
     spellPair(spells,state.results.lane);
    if(result)state.results[key]=result;
-  }
-
-  // Ensure initial lane and spells obey the jungle/Smite rule.
-  if(state.results.lane&&state.results.spells&&!state.locked.spells){
-   state.results.spells=spellPair(spells,state.results.lane);
   }
 
   save();
@@ -673,14 +675,11 @@ async function fetchJson(url){
 $("language").addEventListener("change",e=>{
  state.lang=e.target.value;
  save();
+ // 重新載入對應語言的資料，但保留目前抽選結果。
  loadGameData();
 });
 
 $("generate").addEventListener("click",randomize);
-
-$("toggleSettings").addEventListener("click",()=>{
- $("settings").hidden=!$("settings").hidden;
-});
 
 $("brightness").addEventListener("input",e=>{
  state.brightness=Number(e.target.value);
