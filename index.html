@@ -459,8 +459,17 @@ function randomize(){
  if(!chosen.length){showError(t().noItems);return;}
 
  if(chosen.includes("lane")){
-  const pool=lanePoolForLockedSpells();
-  state.results={...state.results,lane:makeLane(pick(pool))};
+  const pool = lanePoolForLockedSpells();
+
+  if(!pool.length){
+    showError(t().dataMissing);
+    return;
+  }
+
+  state.results = {
+    ...state.results,
+    lane: makeLane(pick(pool))
+  };
  }
  if(chosen.includes("champion"))
   state.results={...state.results,champion:pick(game.champions)};
@@ -468,10 +477,6 @@ function randomize(){
   state.results={...state.results,runes:makeRunePage(game.runes)};
  if(chosen.includes("spells"))
   state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
-
- if(chosen.includes("lane")&&!chosen.includes("spells")&&!state.locked.spells){
-  state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
- }
  if(chosen.some(k=>!state.results[k])){showError(t().dataMissing);return;}
  save();renderResults();showError("");
 }
