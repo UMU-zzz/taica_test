@@ -16,8 +16,8 @@ button,input,select{font:inherit}
 button{cursor:pointer;color:inherit}
 button:disabled{opacity:.4;cursor:not-allowed}
 .app{min-height:100vh;position:relative;isolation:isolate}
-.backdrop{position:fixed;inset:0;z-index:-2;background-position:center;background-size:cover;filter:brightness(var(--brightness,.65))}
-.backdrop:after{content:"";position:absolute;inset:0;background:rgba(5,9,18,var(--overlay,.68))}
+.backdrop{position:fixed;inset:0;z-index:-2;background-position:center;background-size:cover;filter:brightness(var(--brightness,1))}
+.backdrop:after{content:"";position:absolute;inset:0;background:rgba(5,9,18,var(--overlay,.5))}
 header{padding:16px 4%;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:#080b12d9;border-bottom:1px solid var(--line)}
 .brand{font-weight:850;letter-spacing:1px}
 .brand small{display:block;color:var(--gold);font-size:10px;letter-spacing:3px}
@@ -122,9 +122,9 @@ a{color:var(--gold)}
       <p class="hint" id="uploadHint">圖片只會保存在此瀏覽器，最大 2 MB。</p>
       <button id="clearBg" style="display:none">移除自訂背景</button>
 
-      <div class="range-label"><label id="brightnessLabel" for="brightness">亮度</label><b id="brightnessValue">70%</b></div>
+      <div class="range-label"><label id="brightnessLabel" for="brightness">亮度</label><b id="brightnessValue">100%</b></div>
       <input id="brightness" type="range" min="0" max="100" value="100">
-      <div class="range-label"><label id="overlayLabel" for="overlay">遮罩深度</label><b id="overlayValue">65%</b></div>
+      <div class="range-label"><label id="overlayLabel" for="overlay">遮罩深度</label><b id="overlayValue">50%</b></div>
       <input id="overlay" type="range" min="0" max="100" value="50">
 
       <hr style="border:0;border-top:1px solid #ffffff20;margin:22px 0">
@@ -264,7 +264,7 @@ const THEMES = [
 
 const DEFAULT = {
  lang:"zh-TW",theme:"rift",customBg:"",
- brightness:70,overlay:65,
+ brightness:100,overlay:50,
  selected:{champion:true,lane:true,runes:true,spells:true},
  locked:{champion:false,lane:false,runes:false,spells:false},
  results:{champion:null,lane:null,runes:null,spells:null}
@@ -273,6 +273,11 @@ const DEFAULT = {
 function loadState(){
  try{
   const s=JSON.parse(localStorage.getItem(STORAGE));
+  if(s){
+    s.brightness = 100;
+    s.overlay = 50;
+    localStorage.setItem(STORAGE, JSON.stringify(s));
+  }
   if(!s)return structuredClone(DEFAULT);
   return {
    ...structuredClone(DEFAULT),...s,
@@ -307,6 +312,8 @@ function updateBackdrop(){
  $("backdrop").style.setProperty("background-color","#080d18");
  $("brightnessValue").textContent=state.brightness+"%";
  $("overlayValue").textContent=state.overlay+"%";
+ $("brightness").value=state.brightness;
+ $("overlay").value=state.overlay;
  $("clearBg").style.display=state.customBg?"inline-block":"none";
 }
 
