@@ -125,7 +125,7 @@ a{color:var(--gold)}
       <div class="range-label"><label id="brightnessLabel" for="brightness">亮度</label><b id="brightnessValue">100%</b></div>
       <input id="brightness" type="range" min="0" max="100" value="100">
       <div class="range-label"><label id="overlayLabel" for="overlay">遮罩深度</label><b id="overlayValue">0%</b></div>
-      <input id="overlay" type="range" min="0" max="100" value="0">
+      <input id="overlay" type="range" min="0" max="100" value="50">
 
       <hr style="border:0;border-top:1px solid #ffffff20;margin:22px 0">
       <label class="field" id="selectLabel">抽選項目</label>
@@ -264,7 +264,7 @@ const THEMES = [
 
 const DEFAULT = {
  lang:"zh-TW",theme:"rift",customBg:"",
- brightness:100,overlay:0,
+ brightness:70,overlay:65,
  selected:{champion:true,lane:true,runes:true,spells:true},
  locked:{champion:false,lane:false,runes:false,spells:false},
  results:{champion:null,lane:null,runes:null,spells:null}
