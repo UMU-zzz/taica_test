@@ -93,7 +93,7 @@ a{color:var(--gold)}
   <div class="backdrop" id="backdrop"></div>
   <header>
     <div class="brand">
-      <small>SUMMONER'S RIFT</small>
+      <small id="summonerRift">SUMMONER'S RIFT</small>
       <span id="brandTitle">⚔ LoL 隨機挑戰產生器</span>
     </div>
     <div class="top-actions">
@@ -135,7 +135,7 @@ a{color:var(--gold)}
 
     <main class="main">
       <section class="hero-box">
-        <div class="kicker">✦ CHOOSE YOUR FATE ✦</div>
+        <div class="kicker" id="chooseFate">✦ CHOOSE YOUR FATE ✦</div>
         <h1 id="title">LoL 隨機挑戰產生器</h1>
         <p class="muted" id="subtitle">把下一場交給命運。</p>
         <button class="primary-btn" id="generate">✦ 開始隨機 ✦</button>
@@ -169,7 +169,7 @@ const LOCALES = {
 
 const TEXT = {
  "zh-TW":{
-  settings:"設定",theme:"背景主題",custom:"自訂背景圖片",uploadButton:"選擇檔案",noFile:"未選擇任何檔案",uploadHint:"圖片只儲存於此瀏覽器，最大 2 MB。",
+  settings:"設定",summonerRift:"召喚峽谷",chooseFate:"選擇你的命運",theme:"背景主題",custom:"自訂背景圖片",uploadButton:"選擇檔案",noFile:"未選擇任何檔案",uploadHint:"圖片只儲存於此瀏覽器，最大 2 MB。",
   clear:"移除自訂背景",brightness:"亮度",overlay:"遮罩深度",select:"抽選項目",
   hint:"只重新抽選勾選且未鎖定的項目。",title:"LoL 隨機挑戰產生器",
   subtitle:"把下一場交給命運。",generate:"開始隨機",loading:"正在載入 Riot 遊戲資料…",
@@ -186,7 +186,7 @@ const TEXT = {
   runeError:"目前版本的符文資料不足，無法建立合法配置。"
  },
  "zh-CN":{
-  settings:"设置",theme:"背景主题",custom:"自定义背景图片",uploadButton:"选择文件",noFile:"未选择任何文件",uploadHint:"图片仅保存在此浏览器，最大 2 MB。",
+  settings:"设置",summonerRift:"召唤师峡谷",chooseFate:"选择你的命运",theme:"背景主题",custom:"自定义背景图片",uploadButton:"选择文件",noFile:"未选择任何文件",uploadHint:"图片仅保存在此浏览器，最大 2 MB。",
   clear:"移除自定义背景",brightness:"亮度",overlay:"遮罩深度",select:"抽选项目",
   hint:"只重新抽选勾选且未锁定的项目。",title:"LoL 随机挑战生成器",
   subtitle:"把下一场交给命运。",generate:"开始随机",loading:"正在加载 Riot 游戏数据…",
@@ -203,7 +203,7 @@ const TEXT = {
   runeError:"当前版本的符文数据不足，无法创建合法配置。"
  },
  "en-US":{
-  settings:"Settings",theme:"Background themes",custom:"Custom background",uploadButton:"Choose file",noFile:"No file selected",uploadHint:"Saved in this browser only. Max 2 MB.",
+  settings:"Settings",summonerRift:"SUMMONER'S RIFT",chooseFate:"CHOOSE YOUR FATE",theme:"Background themes",custom:"Custom background",uploadButton:"Choose file",noFile:"No file selected",uploadHint:"Saved in this browser only. Max 2 MB.",
   clear:"Remove custom background",brightness:"Brightness",overlay:"Overlay strength",select:"Randomize items",
   hint:"Only checked and unlocked items are rerolled.",title:"LoL Random Challenge",
   subtitle:"Leave your next game to fate.",generate:"Randomize",loading:"Loading Riot game data…",
@@ -220,7 +220,7 @@ const TEXT = {
   runeError:"Not enough rune data to build a valid page."
  },
  "ja-JP":{
-  settings:"設定",theme:"背景テーマ",custom:"カスタム背景",uploadButton:"ファイルを選択",noFile:"ファイルが選択されていません",uploadHint:"画像はこのブラウザーに保存。最大 2 MB。",
+  settings:"設定",summonerRift:"サモナーズリフト",chooseFate:"運命を選べ",theme:"背景テーマ",custom:"カスタム背景",uploadButton:"ファイルを選択",noFile:"ファイルが選択されていません",uploadHint:"画像はこのブラウザーに保存。最大 2 MB。",
   clear:"カスタム背景を削除",brightness:"明るさ",overlay:"オーバーレイ",select:"抽選項目",
   hint:"チェック済みかつロックされていない項目のみ再抽選します。",title:"LoL ランダムチャレンジ",
   subtitle:"次の試合を運命に任せよう。",generate:"ランダム生成",loading:"Riot データを読み込み中…",
@@ -237,7 +237,7 @@ const TEXT = {
   runeError:"有効なルーンページを作成するデータが不足しています。"
  },
  "ko-KR":{
-  settings:"설정",theme:"배경 테마",custom:"사용자 지정 배경",uploadButton:"파일 선택",noFile:"선택된 파일 없음",uploadHint:"이 브라우저에만 저장됩니다. 최대 2 MB.",
+  settings:"설정",summonerRift:"소환사의 협곡",chooseFate:"운명을 선택하라",theme:"배경 테마",custom:"사용자 지정 배경",uploadButton:"파일 선택",noFile:"선택된 파일 없음",uploadHint:"이 브라우저에만 저장됩니다. 최대 2 MB.",
   clear:"사용자 배경 제거",brightness:"밝기",overlay:"오버레이",select:"추첨 항목",
   hint:"체크되어 있고 잠기지 않은 항목만 다시 추첨합니다.",title:"LoL 랜덤 챌린지",
   subtitle:"다음 게임을 운명에 맡겨 보세요.",generate:"랜덤 추첨",loading:"Riot 게임 데이터 로딩 중…",
@@ -653,6 +653,8 @@ function renderLanguage(){
  const x=t();
  document.documentElement.lang=state.lang;
  $("language").value=state.lang;
+ $("summonerRift").textContent = x.summonerRift;
+ $("chooseFate").textContent = "✦ " + x.chooseFate + " ✦";
  $("settingsTitle").textContent=x.settings;
  $("themeLabel").textContent=x.theme;
  $("uploadLabel").textContent=x.custom;
