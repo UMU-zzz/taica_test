@@ -273,11 +273,6 @@ const DEFAULT = {
 function loadState(){
  try{
   const s=JSON.parse(localStorage.getItem(STORAGE));
-  if(s){
-    s.brightness = 100;
-    s.overlay = 50;
-    localStorage.setItem(STORAGE, JSON.stringify(s));
-  }
   if(!s)return structuredClone(DEFAULT);
   return {
    ...structuredClone(DEFAULT),...s,
