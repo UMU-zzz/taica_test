@@ -127,10 +127,6 @@ a{color:var(--gold)}
       <div class="range-label"><label id="overlayLabel" for="overlay">遮罩深度</label><b id="overlayValue">50%</b></div>
       <input id="overlay" type="range" min="0" max="100" value="50">
 
-      <hr style="border:0;border-top:1px solid #ffffff20;margin:22px 0">
-      <label class="field" id="selectLabel">抽選項目</label>
-      <div id="checks"></div>
-      <p class="hint" id="randomHint">只重新抽選勾選且未鎖定的項目。</p>
     </aside>
 
     <main class="main">
@@ -170,15 +166,14 @@ const LOCALES = {
 const TEXT = {
  "zh-TW":{
   settings:"設定",summonerRift:"召喚峽谷",chooseFate:"選擇你的命運",patch:"版本",theme:"背景主題",custom:"自訂背景圖片",uploadButton:"選擇檔案",noFile:"未選擇任何檔案",uploadHint:"圖片只儲存於此瀏覽器，最大 2 MB。",
-  clear:"移除自訂背景",brightness:"亮度",overlay:"遮罩深度",select:"抽選項目",
-  hint:"只重新抽選勾選且未鎖定的項目。",title:"LoL 隨機挑戰產生器",
+  clear:"移除自訂背景",brightness:"亮度",overlay:"遮罩深度",title:"LoL 隨機挑戰產生器",
   subtitle:"把下一場交給命運。",generate:"開始隨機",loading:"正在載入 Riot 遊戲資料…",
   loaded:"遊戲資料已載入",loadError:"遊戲資料載入失敗，請檢查網路後重試。",
   retry:"重試",empty:"尚無結果，請開始隨機抽選。",champion:"英雄",lane:"路線",
   runes:"符文",shards:"屬性碎片",spells:"召喚師技能",reroll:"重新抽選",lock:"鎖定",unlock:"解除鎖定",
   locked:"已鎖定",primary:"主系",secondary:"副系",board:"你的挑戰配置",
   footer:"英雄、符文與召喚師技能資料來自 Riot Data Dragon。",
-  roleNote:"隨機路線，不代表英雄官方定位。",noItems:"請至少勾選一個未鎖定的項目。",
+  roleNote:"隨機路線，不代表英雄官方定位。",noItems:"所有項目都已鎖定，請先解除鎖定。",
   uploadError:"請選擇圖片檔案。",sizeError:"圖片不得超過 2 MB。",
   fileError:"無法讀取圖片。",dataMissing:"資料不完整，請重試。",
   themes:["召喚峽谷","星空","宇宙","暗黑競技場"],
@@ -187,15 +182,14 @@ const TEXT = {
  },
  "zh-CN":{
   settings:"设置",summonerRift:"召唤师峡谷",chooseFate:"选择你的命运",patch:"版本",theme:"背景主题",custom:"自定义背景图片",uploadButton:"选择文件",noFile:"未选择任何文件",uploadHint:"图片仅保存在此浏览器，最大 2 MB。",
-  clear:"移除自定义背景",brightness:"亮度",overlay:"遮罩深度",select:"抽选项目",
-  hint:"只重新抽选勾选且未锁定的项目。",title:"LoL 随机挑战生成器",
+  clear:"移除自定义背景",brightness:"亮度",overlay:"遮罩深度",title:"LoL 随机挑战生成器",
   subtitle:"把下一场交给命运。",generate:"开始随机",loading:"正在加载 Riot 游戏数据…",
   loaded:"游戏数据已加载",loadError:"游戏数据加载失败，请检查网络后重试。",
   retry:"重试",empty:"暂无结果，请开始随机抽选。",champion:"英雄",lane:"路线",
   runes:"符文",shards:"属性碎片",spells:"召唤师技能",reroll:"重新抽选",lock:"锁定",unlock:"解除锁定",
   locked:"已锁定",primary:"主系",secondary:"副系",board:"你的挑战配置",
   footer:"英雄、符文与召唤师技能数据来自 Riot Data Dragon。",
-  roleNote:"随机路线，不代表英雄官方定位。",noItems:"请至少勾选一个未锁定的项目。",
+  roleNote:"随机路线，不代表英雄官方定位。",noItems:"所有项目都已锁定，请先解除锁定。",
   uploadError:"请选择图片文件。",sizeError:"图片不得超过 2 MB。",
   fileError:"无法读取图片。",dataMissing:"数据不完整，请重试。",
   themes:["召唤师峡谷","星空","宇宙","暗黑竞技场"],
@@ -204,15 +198,14 @@ const TEXT = {
  },
  "en-US":{
   settings:"Settings",summonerRift:"SUMMONER'S RIFT",chooseFate:"CHOOSE YOUR FATE",patch:"PATCH",theme:"Background themes",custom:"Custom background",uploadButton:"Choose file",noFile:"No file selected",uploadHint:"Saved in this browser only. Max 2 MB.",
-  clear:"Remove custom background",brightness:"Brightness",overlay:"Overlay strength",select:"Randomize items",
-  hint:"Only checked and unlocked items are rerolled.",title:"LoL Random Challenge",
+  clear:"Remove custom background",brightness:"Brightness",overlay:"Overlay strength",title:"LoL Random Challenge",
   subtitle:"Leave your next game to fate.",generate:"Randomize",loading:"Loading Riot game data…",
   loaded:"Game data loaded",loadError:"Could not load game data. Check your connection and retry.",
   retry:"Retry",empty:"No result yet. Press Randomize.",champion:"Champion",lane:"Lane",
   runes:"Runes",shards:"Stat shards",spells:"Summoner spells",reroll:"Reroll",lock:"Lock",unlock:"Unlock",
   locked:"Locked",primary:"Primary",secondary:"Secondary",board:"Your challenge loadout",
   footer:"Champion, rune and summoner spell data from Riot Data Dragon.",
-  roleNote:"Random challenge lane, not an official champion role.",noItems:"Select at least one unlocked item.",
+  roleNote:"Random challenge lane, not an official champion role.",noItems:"All items are locked. Unlock at least one item first.",
   uploadError:"Choose an image file.",sizeError:"Image must be 2 MB or smaller.",
   fileError:"Could not read the image.",dataMissing:"Incomplete data. Please retry.",
   themes:["Summoner's Rift","Starry Night","Cosmic","Dark Arena"],
@@ -221,15 +214,14 @@ const TEXT = {
  },
  "ja-JP":{
   settings:"設定",summonerRift:"サモナーズリフト",chooseFate:"運命を選べ",patch:"パッチ",theme:"背景テーマ",custom:"カスタム背景",uploadButton:"ファイルを選択",noFile:"ファイルが選択されていません",uploadHint:"画像はこのブラウザーに保存。最大 2 MB。",
-  clear:"カスタム背景を削除",brightness:"明るさ",overlay:"オーバーレイ",select:"抽選項目",
-  hint:"チェック済みかつロックされていない項目のみ再抽選します。",title:"LoL ランダムチャレンジ",
+  clear:"カスタム背景を削除",brightness:"明るさ",overlay:"オーバーレイ",title:"LoL ランダムチャレンジ",
   subtitle:"次の試合を運命に任せよう。",generate:"ランダム生成",loading:"Riot データを読み込み中…",
   loaded:"ゲームデータを読み込みました",loadError:"データを読み込めません。接続を確認して再試行してください。",
   retry:"再試行",empty:"結果がありません。抽選してください。",champion:"チャンピオン",lane:"レーン",
   runes:"ルーン",shards:"ステータスのかけら",spells:"サモナースペル",reroll:"再抽選",lock:"ロック",unlock:"解除",
   locked:"ロック中",primary:"メイン",secondary:"サブ",board:"チャレンジ構成",
   footer:"ゲームデータは Riot Data Dragon から取得しています。",
-  roleNote:"ランダムなチャレンジ用レーンです。",noItems:"ロックされていない項目を選択してください。",
+  roleNote:"ランダムなチャレンジ用レーンです。",noItems:"すべての項目がロックされています。先にロックを解除してください。",
   uploadError:"画像ファイルを選択してください。",sizeError:"画像は 2 MB 以下にしてください。",
   fileError:"画像を読み込めません。",dataMissing:"データが不完全です。再試行してください。",
   themes:["サモナーズリフト","星空","宇宙","ダークアリーナ"],
@@ -238,15 +230,14 @@ const TEXT = {
  },
  "ko-KR":{
   settings:"설정",summonerRift:"소환사의 협곡",chooseFate:"운명을 선택하라",patch:"패치",theme:"배경 테마",custom:"사용자 지정 배경",uploadButton:"파일 선택",noFile:"선택된 파일 없음",uploadHint:"이 브라우저에만 저장됩니다. 최대 2 MB.",
-  clear:"사용자 배경 제거",brightness:"밝기",overlay:"오버레이",select:"추첨 항목",
-  hint:"체크되어 있고 잠기지 않은 항목만 다시 추첨합니다.",title:"LoL 랜덤 챌린지",
+  clear:"사용자 배경 제거",brightness:"밝기",overlay:"오버레이",title:"LoL 랜덤 챌린지",
   subtitle:"다음 게임을 운명에 맡겨 보세요.",generate:"랜덤 추첨",loading:"Riot 게임 데이터 로딩 중…",
   loaded:"게임 데이터를 불러왔습니다",loadError:"데이터를 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.",
   retry:"재시도",empty:"결과가 없습니다. 추첨을 시작하세요.",champion:"챔피언",lane:"라인",
   runes:"룬",shards:"능력치 파편",spells:"소환사 주문",reroll:"다시 뽑기",lock:"잠금",unlock:"잠금 해제",
   locked:"잠김",primary:"주 룬",secondary:"보조 룬",board:"챌린지 구성",
   footer:"게임 데이터는 Riot Data Dragon에서 가져옵니다.",
-  roleNote:"챌린지용 무작위 라인입니다.",noItems:"잠기지 않은 항목을 하나 이상 선택하세요.",
+  roleNote:"챌린지용 무작위 라인입니다.",noItems:"모든 항목이 잠겨 있습니다. 먼저 하나 이상의 잠금을 해제하세요.",
   uploadError:"이미지 파일을 선택하세요.",sizeError:"이미지는 2 MB 이하여야 합니다.",
   fileError:"이미지를 읽을 수 없습니다.",dataMissing:"데이터가 불완전합니다. 다시 시도하세요.",
   themes:["소환사의 협곡","별이 빛나는 밤","우주","다크 아레나"],
@@ -265,7 +256,6 @@ const THEMES = [
 const DEFAULT = {
  lang:"zh-TW",theme:"rift",customBg:"",
  brightness:100,overlay:50,
- selected:{champion:true,lane:true,runes:true,spells:true},
  locked:{champion:false,lane:false,runes:false,spells:false},
  results:{champion:null,lane:null,runes:null,spells:null}
 };
@@ -276,7 +266,6 @@ function loadState(){
   if(!s)return structuredClone(DEFAULT);
   return {
    ...structuredClone(DEFAULT),...s,
-   selected:{...DEFAULT.selected,...s.selected},
    locked:{...DEFAULT.locked,...s.locked},
    results:{...DEFAULT.results,...s.results}
   };
@@ -407,10 +396,12 @@ function isJungle(lane){return laneId(lane)==="jungle";}
 function hasSmite(pair){return Array.isArray(pair)&&pair.some(x=>x.id==="SummonerSmite");}
 
 function lanePoolForLockedSpells(){
- if(!state.locked.spells||!state.results.spells)
+ if(!state.results.spells)
   return ["top","jungle","mid","bottom","support"];
+
  return hasSmite(state.results.spells)
-  ?["jungle"]:["top","mid","bottom","support"];
+  ?["jungle"]
+  :["top","mid","bottom","support"];
 }
 
 function spellPair(spells,lane){
@@ -434,51 +425,95 @@ function spellPairWithoutSmite(spells){
 
 function reroll(key){
  if(!game||busy||state.locked[key])return;
+
  let result=null;
- if(key==="champion")result=pick(game.champions);
- if(key==="lane"){
+
+ if(key==="champion"){
+  result=pick(game.champions);
+ }
+ else if(key==="lane"){
   const pool=lanePoolForLockedSpells();
-  result=makeLane(pick(pool));
-  if(!state.locked.spells){
-   const nextSpells=spellPair(game.spells,result);
-   if(nextSpells)state.results={...state.results,spells:nextSpells};
+  if(!pool.length){
+   showError(t().dataMissing);
+   return;
   }
- }else if(key==="runes")result=makeRunePage(game.runes);
- else if(key==="spells")result=spellPair(game.spells,state.results.lane);
+  result=makeLane(pick(pool));
+ }
+ else if(key==="runes"){
+  result=makeRunePage(game.runes);
+ }
+ else if(key==="spells"){
+  result=spellPair(game.spells,state.results.lane);
+ }
+
  if(!result){
   showError(key==="runes"?t().runeError:t().dataMissing);
   return;
  }
+
  state.results={...state.results,[key]:result};
- save();renderResults();showError("");
+ save();
+ renderResults();
+ showError("");
 }
 
 function randomize(){
  if(!game||busy)return;
- const chosen=keys.filter(k=>state.selected[k]&&!state.locked[k]);
- if(!chosen.length){showError(t().noItems);return;}
 
+ const chosen=keys.filter(k=>!state.locked[k]);
+
+ if(!chosen.length){
+  showError(t().noItems);
+  return;
+ }
+
+ // 如果技能也會重抽，路線可以先從全部路線中選擇。
+ // 如果技能被鎖定，就必須符合目前技能的重擊配置。
  if(chosen.includes("lane")){
-  const pool = lanePoolForLockedSpells();
+  const pool=chosen.includes("spells")
+   ?["top","jungle","mid","bottom","support"]
+   :lanePoolForLockedSpells();
 
   if(!pool.length){
-    showError(t().dataMissing);
-    return;
+   showError(t().dataMissing);
+   return;
   }
 
-  state.results = {
-    ...state.results,
-    lane: makeLane(pick(pool))
+  state.results={
+   ...state.results,
+   lane:makeLane(pick(pool))
   };
  }
- if(chosen.includes("champion"))
-  state.results={...state.results,champion:pick(game.champions)};
- if(chosen.includes("runes"))
-  state.results={...state.results,runes:makeRunePage(game.runes)};
- if(chosen.includes("spells"))
-  state.results={...state.results,spells:spellPair(game.spells,state.results.lane)};
- if(chosen.some(k=>!state.results[k])){showError(t().dataMissing);return;}
- save();renderResults();showError("");
+
+ if(chosen.includes("champion")){
+  state.results={
+   ...state.results,
+   champion:pick(game.champions)
+  };
+ }
+
+ if(chosen.includes("runes")){
+  state.results={
+   ...state.results,
+   runes:makeRunePage(game.runes)
+  };
+ }
+
+ if(chosen.includes("spells")){
+  state.results={
+   ...state.results,
+   spells:spellPair(game.spells,state.results.lane)
+  };
+ }
+
+ if(chosen.some(k=>!state.results[k])){
+  showError(t().dataMissing);
+  return;
+ }
+
+ save();
+ renderResults();
+ showError("");
 }
 
 function renderThemes(){
@@ -493,22 +528,6 @@ function renderThemes(){
    state.theme=button.dataset.theme;
    state.customBg="";
    save();updateBackdrop();renderThemes();
-  });
- });
-}
-
-function renderChecks(){
- $("checks").innerHTML=keys.map(key=>`
-  <label class="check">
-   <input type="checkbox" data-select="${key}" ${state.selected[key]?"checked":""}>
-   <span>${escapeHtml(t()[key])}</span>
-   <small>${state.locked[key]?"🔒 "+escapeHtml(t().locked):""}</small>
-  </label>`).join("");
-
- $("checks").querySelectorAll("[data-select]").forEach(input=>{
-  input.addEventListener("change",()=>{
-   state.selected={...state.selected,[input.dataset.select]:input.checked};
-   save();
   });
  });
 }
@@ -588,7 +607,7 @@ function renderResults(){
   button.addEventListener("click",()=>{
    const key=button.dataset.lock;
    state.locked={...state.locked,[key]:!state.locked[key]};
-   save();renderResults();updateLockCount();renderChecks();
+   save();renderResults();updateLockCount();
   });
  });
 
@@ -685,7 +704,6 @@ function renderLanguage(){
  $("status").textContent=busy?x.loading:(game?`${x.loaded} · ${game.version}`:"");
 
  renderThemes();
- renderChecks();
  renderResults();
  updateBackdrop();
 }
