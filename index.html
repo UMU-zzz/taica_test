@@ -168,7 +168,7 @@ const TEXT = {
   roleNote:"隨機路線，不代表英雄官方定位。",noItems:"所有項目都已鎖定，請先解除鎖定。",
   uploadError:"請選擇圖片檔案。",sizeError:"圖片不得超過 2 MB。",
   fileError:"無法讀取圖片。",dataMissing:"資料不完整，請重試。",
-  themes:["召喚峽谷","星空","宇宙","暗黑競技場"],
+  themes:["愛歐尼亞","闇影島","蒂瑪西亞","諾克薩斯"],
   lanes:["上路","打野","中路","下路","輔助"],
   runeError:"目前版本的符文資料不足，無法建立合法配置。"
  },
@@ -183,7 +183,7 @@ const TEXT = {
   roleNote:"随机路线，不代表英雄官方定位。",noItems:"所有项目都已锁定，请先解除锁定。",
   uploadError:"请选择图片文件。",sizeError:"图片不得超过 2 MB。",
   fileError:"无法读取图片。",dataMissing:"数据不完整，请重试。",
-  themes:["召唤师峡谷","星空","宇宙","暗黑竞技场"],
+  themes:["艾欧尼亚","暗影岛","德玛西亚","诺克萨斯"],
   lanes:["上路","打野","中路","下路","辅助"],
   runeError:"当前版本的符文数据不足，无法创建合法配置。"
  },
@@ -198,7 +198,7 @@ const TEXT = {
   roleNote:"Random challenge lane, not an official champion role.",noItems:"All items are locked. Unlock at least one item first.",
   uploadError:"Choose an image file.",sizeError:"Image must be 2 MB or smaller.",
   fileError:"Could not read the image.",dataMissing:"Incomplete data. Please retry.",
-  themes:["Summoner's Rift","Starry Night","Cosmic","Dark Arena"],
+  themes:["Ionia","Shadow Isles","Demacia","Noxus"],
   lanes:["Top","Jungle","Mid","Bottom","Support"],
   runeError:"Not enough rune data to build a valid page."
  },
@@ -213,7 +213,7 @@ const TEXT = {
   roleNote:"ランダムなチャレンジ用レーンです。",noItems:"すべての項目がロックされています。先にロックを解除してください。",
   uploadError:"画像ファイルを選択してください。",sizeError:"画像は 2 MB 以下にしてください。",
   fileError:"画像を読み込めません。",dataMissing:"データが不完全です。再試行してください。",
-  themes:["サモナーズリフト","星空","宇宙","ダークアリーナ"],
+  themes:["アイオニア","シャドウアイル","デマーシア","ノクサス"],
   lanes:["トップ","ジャングル","ミッド","ボット","サポート"],
   runeError:"有効なルーンページを作成するデータが不足しています。"
  },
@@ -228,17 +228,17 @@ const TEXT = {
   roleNote:"챌린지용 무작위 라인입니다.",noItems:"모든 항목이 잠겨 있습니다. 먼저 하나 이상의 잠금을 해제하세요.",
   uploadError:"이미지 파일을 선택하세요.",sizeError:"이미지는 2 MB 이하여야 합니다.",
   fileError:"이미지를 읽을 수 없습니다.",dataMissing:"데이터가 불완전합니다. 다시 시도하세요.",
-  themes:["소환사의 협곡","별이 빛나는 밤","우주","다크 아레나"],
+  themes:["아이오니아","그림자 군도","데마시아","녹서스"],
   lanes:["탑","정글","미드","바텀","서포터"],
   runeError:"유효한 룬 페이지를 만들 데이터가 부족합니다."
  }
 };
 
 const THEMES = [
- {id:"rift",url:"https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1800&q=80"},
- {id:"stars",url:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1800&q=80"},
- {id:"cosmos",url:"https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=80"},
- {id:"dark",url:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1800&q=80"}
+  { id: "ionia", url: "./assets/ionia.jpg" },
+  { id: "shadow-isles", url: "./assets/shadow-isles.jpg" },
+  { id: "demacia", url: "./assets/demacia.jpg" },
+  { id: "noxus", url: "./assets/noxus.jpg" }
 ];
 
 const DEFAULT = {
@@ -252,6 +252,15 @@ function loadState(){
  try{
   const s=JSON.parse(localStorage.getItem(STORAGE));
   if(!s)return structuredClone(DEFAULT);
+  const oldThemeMap = {
+  rift: "ionia",
+  stars: "shadow-isles",
+  cosmos: "demacia",
+  dark: "noxus"
+  };
+  if (oldThemeMap[s.theme]) {
+    s.theme = oldThemeMap[s.theme];
+  }
   return {
    ...structuredClone(DEFAULT),...s,
    locked:{...DEFAULT.locked,...s.locked},
