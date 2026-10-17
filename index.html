@@ -82,8 +82,6 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .placeholder{color:var(--muted);font-size:12px;padding:25px 0;text-align:center}
 .spinner{width:30px;height:30px;border:3px solid #ffffff24;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-footer{text-align:center;color:var(--muted);font-size:11px;padding:28px 10px}
-a{color:var(--gold)}
 @media(max-width:850px){.layout{grid-template-columns:1fr;padding:14px}.panel{order:2}.main{order:1}.grid{grid-template-columns:1fr}}
 @media(max-width:480px){header{padding:13px}.brand{font-size:13px}.top-actions{width:100%}.top-actions select{flex:1;min-width:0}.card{padding:12px}.card-head h2{font-size:15px}.actions button{padding:6px;font-size:11px}.hero-box{padding:24px 10px}.runes{gap:8px}.rune{font-size:10px}.champion img{width:70px;height:70px}}
 </style>
@@ -144,11 +142,6 @@ a{color:var(--gold)}
         <span class="muted" id="lockCount"></span>
       </div>
       <section class="grid" id="results"></section>
-      <footer>
-        <span id="footerText">英雄、符文與召喚師技能資料來自 Riot Data Dragon。</span><br>
-        <a href="https://developer.riotgames.com/docs/lol" target="_blank" rel="noreferrer">Riot Developer Portal</a>
-        · <a href="https://ddragon.leagueoflegends.com/api/versions.json" target="_blank" rel="noreferrer">Data Dragon Versions</a>
-      </footer>
     </main>
   </div>
 </div>
@@ -172,7 +165,6 @@ const TEXT = {
   retry:"重試",empty:"尚無結果，請開始隨機抽選。",champion:"英雄",lane:"路線",
   runes:"符文",shards:"屬性碎片",spells:"召喚師技能",reroll:"重新抽選",lock:"鎖定",unlock:"解除鎖定",
   locked:"已鎖定",primary:"主系",secondary:"副系",board:"你的挑戰配置",
-  footer:"英雄、符文與召喚師技能資料來自 Riot Data Dragon。",
   roleNote:"隨機路線，不代表英雄官方定位。",noItems:"所有項目都已鎖定，請先解除鎖定。",
   uploadError:"請選擇圖片檔案。",sizeError:"圖片不得超過 2 MB。",
   fileError:"無法讀取圖片。",dataMissing:"資料不完整，請重試。",
@@ -188,7 +180,6 @@ const TEXT = {
   retry:"重试",empty:"暂无结果，请开始随机抽选。",champion:"英雄",lane:"路线",
   runes:"符文",shards:"属性碎片",spells:"召唤师技能",reroll:"重新抽选",lock:"锁定",unlock:"解除锁定",
   locked:"已锁定",primary:"主系",secondary:"副系",board:"你的挑战配置",
-  footer:"英雄、符文与召唤师技能数据来自 Riot Data Dragon。",
   roleNote:"随机路线，不代表英雄官方定位。",noItems:"所有项目都已锁定，请先解除锁定。",
   uploadError:"请选择图片文件。",sizeError:"图片不得超过 2 MB。",
   fileError:"无法读取图片。",dataMissing:"数据不完整，请重试。",
@@ -204,7 +195,6 @@ const TEXT = {
   retry:"Retry",empty:"No result yet. Press Randomize.",champion:"Champion",lane:"Lane",
   runes:"Runes",shards:"Stat shards",spells:"Summoner spells",reroll:"Reroll",lock:"Lock",unlock:"Unlock",
   locked:"Locked",primary:"Primary",secondary:"Secondary",board:"Your challenge loadout",
-  footer:"Champion, rune and summoner spell data from Riot Data Dragon.",
   roleNote:"Random challenge lane, not an official champion role.",noItems:"All items are locked. Unlock at least one item first.",
   uploadError:"Choose an image file.",sizeError:"Image must be 2 MB or smaller.",
   fileError:"Could not read the image.",dataMissing:"Incomplete data. Please retry.",
@@ -220,7 +210,6 @@ const TEXT = {
   retry:"再試行",empty:"結果がありません。抽選してください。",champion:"チャンピオン",lane:"レーン",
   runes:"ルーン",shards:"ステータスのかけら",spells:"サモナースペル",reroll:"再抽選",lock:"ロック",unlock:"解除",
   locked:"ロック中",primary:"メイン",secondary:"サブ",board:"チャレンジ構成",
-  footer:"ゲームデータは Riot Data Dragon から取得しています。",
   roleNote:"ランダムなチャレンジ用レーンです。",noItems:"すべての項目がロックされています。先にロックを解除してください。",
   uploadError:"画像ファイルを選択してください。",sizeError:"画像は 2 MB 以下にしてください。",
   fileError:"画像を読み込めません。",dataMissing:"データが不完全です。再試行してください。",
@@ -236,7 +225,6 @@ const TEXT = {
   retry:"재시도",empty:"결과가 없습니다. 추첨을 시작하세요.",champion:"챔피언",lane:"라인",
   runes:"룬",shards:"능력치 파편",spells:"소환사 주문",reroll:"다시 뽑기",lock:"잠금",unlock:"잠금 해제",
   locked:"잠김",primary:"주 룬",secondary:"보조 룬",board:"챌린지 구성",
-  footer:"게임 데이터는 Riot Data Dragon에서 가져옵니다.",
   roleNote:"챌린지용 무작위 라인입니다.",noItems:"모든 항목이 잠겨 있습니다. 먼저 하나 이상의 잠금을 해제하세요.",
   uploadError:"이미지 파일을 선택하세요.",sizeError:"이미지는 2 MB 이하여야 합니다.",
   fileError:"이미지를 읽을 수 없습니다.",dataMissing:"데이터가 불완전합니다. 다시 시도하세요.",
@@ -698,7 +686,6 @@ function renderLanguage(){
  $("subtitle").textContent=x.subtitle;
  $("generate").textContent="✦ "+x.generate+" ✦";
  $("boardTitle").textContent=x.board;
- $("footerText").textContent=x.footer;
  $("status").textContent=busy?x.loading:(game?`${x.loaded} · ${game.version}`:"");
 
  renderThemes();
